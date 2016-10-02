@@ -1,0 +1,9 @@
+Before class, please download and install R Studio: 
+	https://www.rstudio.com/products/rstudio/download3/ 
+
+If your installation does not work and says you need to install the binary files, please do so here: 
+	https://cloud.r-project.org/
+
+Also download and install Python by following these instructions: 
+	https://github.com/dlab-berkeley/python-intensive/blob/master/Install.md
+		(you can also just pip install scikit-learn if you have Python but not Anaconda).
