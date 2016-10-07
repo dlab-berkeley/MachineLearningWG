@@ -87,6 +87,20 @@ printcp(tree_model)
 summary(tree_model)
 ```
 
+We did not create a separate holdout or test set, so let's predict back on the original data.
+
+```{r}
+predictions = predict(tree_model, iris)
+summary(predictions)
+
+# How do the predictions look compared to the outcome data?
+data.frame(iris$Species, predictions)
+
+# This is an optimistic view because the model was built on this same data.
+# With a random holdout set we would get a more realistic view of accuracy.
+
+```
+
 ## Regression
 
 Quick regression example.
