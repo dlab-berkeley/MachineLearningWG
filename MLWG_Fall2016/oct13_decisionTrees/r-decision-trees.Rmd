@@ -41,14 +41,18 @@ help(package = "rpart")
 # Review the configuration options for trees.
 ?rpart.control
 
+# We need to set a seed due to randomness in the cross-validation.
+set.seed(1)
+
 # Fit a classification decision tree to predict Species using all other variables.
 # We don't need to specify method="class" because Species is a factor variable.
+# We specify 10 cross-validation folds to determine the best complexity.
+# Minbucket is the minimum number of observations in a node.
 tree_model = rpart(Species ~ ., data = iris,
             control = rpart.control(xval = 10, minbucket = 5, cp = 0))
 
 # Display the decision tree in text form.
 tree_model
-
 
 # Plot tree graphically.
 plot(tree_model, compress = T)
@@ -72,7 +76,12 @@ rpart.plot(tree_model)
 # Review the vignette if interested.
 help(package = "rpart.plot")
 
+# Another way to plot it.
+library(partykit)
+plot(as.party(tree_model))
+
 # fancyRpartPlot() in the rattle package is also good.
+
 ```
 
 We can dig into the details of the tree a bit more.
@@ -83,8 +92,25 @@ We can dig into the details of the tree a bit more.
 # When nsplits is large we have 1  + # splits nodes and each node is its own prediction.
 printcp(tree_model)
 
+# Save the complexit parameter table.
+cp_table = printcp(tree_model)
+
+# Review structure of the cp table.
+str(cp_table)
+
+# Which row has minimum cross-validation error?
+# Alternatively we could choose the tree within 1 SD of the minimum.
+best_row = cp_table[which.min(cp_table[, "xerror"]), ]
+best_row
+best_row["CP"]
+
 # Get all the details on the tree.
-summary(tree_model)
+summary(tree_model, cp = best_row["CP"])
+
+# Prune to the optimal complexity parameter (no change in this case).
+tree_model = prune(tree_model, cp = best_row["CP"])
+
+tree_model
 ```
 
 We did not create a separate holdout or test set, so let's predict back on the original data.
@@ -111,14 +137,41 @@ data(car90)
 # Review structure of dataset.
 str(car90)
 
-# Predict price using all other fields.
-reg_tree = rpart(Price ~ ., data = car90)
+# Set seed due to cross-validation randomness.
+set.seed(1)
+
+# Predict price using most other fields.
+# Remove a few fields that are too predictive (rim) or too many categories.
+reg_tree = rpart(Price ~ ., data = car90[, !names(car90) %in% c("Rim", "Tires", "Model2")])
 
 # How'd it go?
 reg_tree
 
-# Visualize this bad boy.
+# Review complexity parameter options.
+printcp(reg_tree)
+
+# Visualize results across complexity parameter.
+rsq.rpart(reg_tree)
+
+# Save the complexit parameter table.
+cp_table = printcp(reg_tree)
+
+# Which row has minimum cross-validation error?
+best_row = cp_table[which.min(cp_table[, "xerror"]), ]
+best_row
+best_row["CP"]
+
+# Review summary with the best complexity parameter.
+summary(reg_tree, cp = best_row["CP"])
+
+# Prune our tree back to the best complexity parameter.
+# Note that in this case no real pruning is needed, because
+# the full tree is the best.
+reg_tree = prune(reg_tree, cp = best_row["CP"])
+
+# Visualize our final tree.
 rpart.plot(reg_tree)
+
 ```
 
 # Caret
@@ -127,14 +180,17 @@ rpart.plot(reg_tree)
 library(caret)
 
 # Nice and simple - using default settings for everything.
-# caret tries 3 complexity parameters by default, but tuneLength would customizex that.
-model = train(Species ~ ., data = iris, method = "rpart")
+# caret tries 3 complexity parameters by default, but tuneLength customizes that.
+model = train(Species ~ ., data = iris, method = "rpart", tuneLength = 5)
 
 # We see again that cp= 0 gives us the best accuracy.
 model
 
 # Use the handle built-in caret plotting.
 plot(model)
+
+# Look at the final model object (rpart).
+model$finalModel
 ```
 
 # SuperLearner
@@ -157,8 +213,10 @@ table(data$Species, iris$Species, useNA = "ifany")
 
 library(SuperLearner)
 
-sl = SuperLearner(X = data[, -5], Y = data$Species, SL.library = c("SL.mean", "SL.rpart"),
-                  family = binomial())
+set.seed(1)
+
+sl = SuperLearner(X = data[, -5], Y = data$Species, family = binomial(),
+                  SL.library = c("SL.mean", "SL.rpart"))
 sl
 
 # Review the raw rpart object.
