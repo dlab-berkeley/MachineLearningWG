@@ -284,20 +284,20 @@ task = makeClassifTask(data = data, target = "Species")
 n = getTaskSize(task)
 
 # Generate the learners.
-learners = list(makeLearner("classif.rpart", id = "rpart"))
+learners = list(makeLearner("classif.rpart", id = "rpart", predict.type = "prob"))
 
 # 5-fold cross-validation, stratifying on Y to ensure balance across folds.
 # could use stratify.cols to stratify on certain important covariates.
 rdesc = makeResampleDesc("CV", iters = 5, stratify = T)
 
 # Fit model across cross-validation folds and calculate the performance.
-result = benchmark(learners, task, rdesc)
+result = benchmark(learners, task, rdesc, measures = list(acc, mmce, auc))
 
 # MMCE = mean misclassification error (i.e. 1 - accuracy)
 result
 
 # Plot the results. Generally we would plot multiple models here.
-plotBMRBoxplots(result, measure = mmce)
+plotBMRBoxplots(result, measure = auc)
 ```
 
 
