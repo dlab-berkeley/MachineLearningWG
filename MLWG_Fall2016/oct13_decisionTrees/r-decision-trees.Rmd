@@ -171,6 +171,8 @@ rpart.plot::rpart.plot(sl$fitLibrary$SL.rpart_All$object)
 
 # h2o.ai
 
+We can get close to a single decision tree by using randomForest in h2o. We set RF to fit a single decision tree and to search all variables at each split. It will not be exactly the same due to boostrap sampling but will be similar.
+
 ```{r}
 library(h2o)
 
@@ -178,14 +180,17 @@ library(h2o)
 h2o.init()
 
 # Load iris data into h2o.
-iris_h2o = h2o.uploadFile(path = system.file("extdata", "iris_wheader.csv", package="h2o"), destination_frame = "iris_h2o")
+iris_h2o = h2o.uploadFile(path = system.file("extdata", "iris_wheader.csv", package="h2o"),
+                          destination_frame = "iris_h2o")
 
 # Confirm it loaded correctly.
 summary(iris_h2o)
 
-# Specify x and y by the column indices. Set ntree to 1, and mtries to # of covariates.
-iris_tree = h2o.randomForest(y = 5, x = 1:4, training_frame = iris_h2o, ntrees = 1,
-                             mtries = 4)
+# Specify x and y by the column indices.
+# Set ntree to 1, and mtries to # of covariates.
+# Seed only reproducible when running single-threaded.
+iris_tree = h2o.randomForest(y = 5, x = 1:4, training_frame = iris_h2o,
+                             ntrees = 1, mtries = 4, seed = 1)
 
 # Review results.
 iris_tree
