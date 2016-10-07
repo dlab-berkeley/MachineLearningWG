@@ -268,17 +268,11 @@ h2o.shutdown(prompt = F)
 
 # mlr
 
-In MLR we are also doing binary classification.
-
 ```{r}
 library(mlr)
 
-# mlr wants the outcome to be a factor variable rather than numeric.
-data$Species = as.factor(data$Species)
-
-# Generate the task for binary classification.
-# Use makeMultilabelTask if going for multi-label classifcation.
-task = makeClassifTask(data = data, target = "Species")
+# Generate the task for multiple classification (also works for binary).
+task = makeClassifTask(data = iris, target = "Species")
 
 # Get the number of observations
 n = getTaskSize(task)
@@ -291,13 +285,13 @@ learners = list(makeLearner("classif.rpart", id = "rpart", predict.type = "prob"
 rdesc = makeResampleDesc("CV", iters = 5, stratify = T)
 
 # Fit model across cross-validation folds and calculate the performance.
-result = benchmark(learners, task, rdesc, measures = list(acc, mmce, auc))
+result = benchmark(learners, task, rdesc, measures = list(acc, mmce))
 
 # MMCE = mean misclassification error (i.e. 1 - accuracy)
 result
 
 # Plot the results. Generally we would plot multiple models here.
-plotBMRBoxplots(result, measure = auc)
+plotBMRBoxplots(result, measure = acc)
 ```
 
 
