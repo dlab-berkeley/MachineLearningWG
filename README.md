@@ -17,7 +17,7 @@ More information on the [D-Lab website](http://dlab.berkeley.edu/working-groups/
 
 Books:
 
-* [Intro to Statistical Learning](https://smile.amazon.com/Introduction-Statistical-Learning-Applications-Statistics-ebook/dp/B01IBM7790/) by Gareth James et al.
+* Intro to Statistical Learning [(free pdf)](http://www-bcf.usc.edu/~gareth/ISL/ISLR%20First%20Printing.pdf) [(Amazon page)](https://smile.amazon.com/Introduction-Statistical-Learning-Applications-Statistics-ebook/dp/B01IBM7790/) by Gareth James et al.
 * [Applied Predictive Modeling](https://smile.amazon.com/Applied-Predictive-Modeling-Max-Kuhn-ebook/dp/B00K15TZU0/) by Max Kuhn
 * Elements of Statistical Learning
 * Many others (any recommendations?)
