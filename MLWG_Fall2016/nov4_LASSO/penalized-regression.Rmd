@@ -50,6 +50,10 @@ reg = cv.glmnet(X_train, Y_train, family = "gaussian", alpha = 1)
 # Look at distribution of penalty term lambda.
 plot(reg)
 
+# Plot the underlying glmnet object, showing
+# coefficients for differnt lambda values.
+plot(reg$glmnet.fit, xvar = "lambda", label = T)
+
 # Lambda with minimum mean-squared error.
 reg$lambda.min
 
@@ -82,6 +86,10 @@ reg = cv.glmnet(X_train, Y_train, family = "gaussian", alpha = 0)
 
 # Look at distribution of penalty term lambda.
 plot(reg)
+
+# Plot the underlying glmnet object, showing
+# coefficients for differnt lambda values.
+plot(reg$glmnet.fit, xvar = "lambda", label = T)
 
 # Predict on test set.
 pred = predict(reg, s = reg$lambda.1se, newx = X_test)
