@@ -131,3 +131,5 @@ mean((pred - Y_test)^2)
 # References
 
 Intro to Statistical Learning, Chapter 6
+
+[Glmnet vignette by Hastie and Qian](https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html) - lots of great code examples
