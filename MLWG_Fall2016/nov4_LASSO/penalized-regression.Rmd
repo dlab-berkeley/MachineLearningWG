@@ -58,10 +58,10 @@ reg$lambda.min
 reg$lambda.1se
 
 # Review coeffients
-predict(reg, type = "coefficients", s = reg$lambda.1se)
+coef(reg, s = "lambda.1se")
 
 # What about for lambda.min?
-predict(reg, type = "coefficients", s = reg$lambda.min)
+coef(reg, s = "lambda.min")
 
 # Predict on test set.
 pred = predict(reg, s = reg$lambda.1se, newx = X_test)

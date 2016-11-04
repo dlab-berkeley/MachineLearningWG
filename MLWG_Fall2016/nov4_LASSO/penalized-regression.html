@@ -219,7 +219,7 @@ reg$lambda.min</code></pre>
 reg$lambda.1se</code></pre>
 <pre><code>## [1] 0.7903744</code></pre>
 <pre class="r"><code># Review coeffients
-predict(reg, type = &quot;coefficients&quot;, s = reg$lambda.1se)</code></pre>
+coef(reg, s = &quot;lambda.1se&quot;)</code></pre>
 <pre><code>## 14 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
 ##                        1
 ## (Intercept) 13.689888992
@@ -237,7 +237,7 @@ predict(reg, type = &quot;coefficients&quot;, s = reg$lambda.1se)</code></pre>
 ## black        0.004353469
 ## lstat       -0.406882006</code></pre>
 <pre class="r"><code># What about for lambda.min?
-predict(reg, type = &quot;coefficients&quot;, s = reg$lambda.min)</code></pre>
+coef(reg, s = &quot;lambda.min&quot;)</code></pre>
 <pre><code>## 14 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
 ##                         1
 ## (Intercept)  30.639937693
