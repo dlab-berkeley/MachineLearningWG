@@ -7,9 +7,11 @@ Fall 2016 Schedule
 * September 23 - Introductory meeting
 * October 7 - [Decision trees](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/MLWG_Fall2016/oct13_decisionTrees)
 * October 21 - [Random forests](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/MLWG_Fall2016/oct21_randomForests)
-* November 4
-* November 18
+* November 4 - [Penalized regression](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/MLWG_Fall2016/nov4_LASSO) - lasso, ridge, elastic net
+* November 18 - Evan's skull dataset and GBM
 * December 2
+
+Spring 2017 Schedule - to be determined, topics welcome!
 
 More information on the [D-Lab website](http://dlab.berkeley.edu/working-groups/machine-learning-working-group)
 
@@ -25,12 +27,15 @@ Books:
 Courses at Berkeley:
 
 * Stat 154 - Statistical Learning
-* PH 252D  - Causal Inference
 * CS 189 / CS 289A - Machine Learning
+* PH 252D  - Causal Inference
 * PH 295 - Big Data
 * PH 295 - Targeted Learning for Biomedical Big Data
 * INFO - TBD
-* Coursera and other online classes.
+
+Coursera and other online classes
+
+* To add
 
 D-Lab Machine Learning Trainings
 
@@ -42,7 +47,7 @@ D-Lab Machine Learning Trainings
 
 Other Campus Groups
 
-* Machine Learning @ Berkeley
+* [Machine Learning @ Berkeley](https://ml.berkeley.edu/)
 * D-Lab's Cloud Computing Working Group
 * D-Lab's Computational Text Analysis Working Group
-* The Hacker Within / Berkeley Institute for Data Science
+* [The Hacker Within](http://www.thehackerwithin.org/berkeley/) / Berkeley Institute for Data Science
