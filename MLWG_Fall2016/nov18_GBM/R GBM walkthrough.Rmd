@@ -1,0 +1,178 @@
+---
+title: "R GBM walkthrough"
+author: "Evan Muzzall"
+date: "November 18, 2016"
+output: 
+  html_document: 
+    toc: yes
+    toc_float: yes
+---
+
+# 0.  Freund and Schapire 1999 - background
+From [Freund and Schapire 1999](https://cseweb.ucsd.edu/~yfreund/papers/IntroToBoosting.pdf). 
+"Boosting is a general method for improving the accuracy of any given learning algorithm" and originated in the AdaBoost and PAC learning (p. 1-2). Gradient boosted machines are ensembles decision tree methods of "weak" trees that are just slightly more accurate than random guessing which are then "boosted" into "strong" learners. That is, the models don't have to be accurate over the entire feature space. 
+
+The model first tried to predict each value in a dataset - the cases that can be predicted easily are _downweighted_ so that the algorithm does not have to try as hard to predic them. 
+
+However, the cases that the model has difficulty predicting are _upweighted_ so that the model tries more assertively to predict them. This continues for multiple "boosting" iterations. A resample-based performance measure is produced at each iteration. Error is measured on the weak learners so that even performing slightly better than random guessing improves accuracy fast (p.2). This method can drive down generalization error thus preventing overfitting (p. 5). While it is susceptible to noise, it is robust to outlier detection. 
+
+# 1.  install packages
+```{r, eval=FALSE}
+install.packages("car", dependencies=TRUE)
+install.packages("caret", dependencies=TRUE)
+install.packages("pROC", dependencies=TRUE)
+```
+```{r, eval=FALSE}
+library(car)
+library(caret)
+library(pROC)
+``` 
+
+# 2.  load the Mroz dataset
+```{r}
+library(car)
+data(Mroz)
+str(Mroz)
+```
+### 2.1 See variable definitions with `?Mroz`
+
+# 3.  use createDataPartition() to create an 75/25 stratified random split
+```{r}
+library(caret)
+split <- createDataPartition(Mroz$lfp, p=0.75, list=FALSE)
+training.set <- Mroz[split,]
+test.set <- Mroz[-split,]
+nrow(training.set) + nrow(test.set) == nrow(Mroz) # sanity check
+```
+
+`createDataPartition` = creates a stratified random split
+training.set = train model here
+test.set = does trained model maintain its performance here?
+
+# 4.  train() a GBM model
+```{r}
+set.seed(1)
+gbm.fit1 <- train(lfp ~ ., data=training.set, method="gbm", verbose=FALSE)
+```
+
+`train()` holds the tuning parameters; fits each one then calculates a resampling based performance metric
+
+" . " comes from Perl's regex library and stands for "everything else".
+
+### 4.1 model summary
+View a model summary table by calling the object. caret shows us the optimal model based on its attributes
+```{r}
+gbm.fit1
+```
+
+interaction.depth = tree depth/complexity
+n.trees = number of boosting iterations
+Accuracy = overall agreement rate averaged over the cross-validated boosting iterations
+Kappa = Cohen's unweighted kappa averaged across resampling results (1 = perfect agreement)
+
+### 4.2 Plot bargraph of variable relative influence with summary()
+```{r}
+summary(gbm.fit1, las=2, main="GBM relative influence")
+gbm.fit1$times
+```
+
+# 5. trainControl() and expand.grid()
+### 5.1 define the parameters of the control mechanism with `trainControl()`
+```{r}
+control <- trainControl(method="repeatedcv", 
+	repeats=5,
+	classProbs=TRUE,
+	summaryFunction=twoClassSummary)
+```
+
+method = "repeatedcv": CV measures predictive performance of a statistical model; 
+repeats = number of times to repeat the cross-validation
+classProbs = this will calculate predicted class probabilities (ROC) within the resampling process (Kuhn, 2015:4)
+summaryFunction = uses observed versus predicted values to estimate performance (AUC, sensitivity, specificity) (Kuhn, 2015:4)
+
+### 5.2 compare multiple models at once with `expand.grid()`
+```{r}
+grid <- expand.grid(n.trees=seq(100,2100, by=100),
+	interaction.depth=seq(1,3,5),
+	shrinkage=c(0.01,0.05, 0.1),
+	n.minobsinnode=10)
+```
+
+shrinkage = learning rate of the algorithm; how quickly the model adapts to the data at each iteration
+n.minobsinnode = minimum number of observations needed to commence splitting
+
+n.trees = number of boosting iterations
+interaction.depth = tree depth/complexity
+shrinkage = learning rate of the model; how quickly it adapts at each iteration
+n.minobsinnode = minimum number of samples needed to commence splitting
+
+```{r}
+set.seed(1)
+gbm.fit2 <- train(lfp ~ ., data=training.set,
+	method="gbm",
+	metric="ROC",
+	trControl=control,
+	tuneGrid=grid,
+	verbose=FALSE)
+gbm.fit2$times
+```
+
+verbose = print lengthy output (`TRUE` or `FALSE`?)
+
+### 5.3 model summary table
+```{r}
+gbm.fit2
+```
+
+### 5.4 bargraph of variable relative influence
+```{r}
+summary(gbm.fit2, las=2)
+```
+
+# 6.  ggplot line graph of the tunded models
+```{r}
+ggplot(gbm.fit2) + theme_grey() + ggtitle("Model comparisons")
+```
+
+Want to learn more about ggplot2 themes? :) See [the ggplot2 themes help page](http://docs.ggplot2.org/dev/vignettes/themes.html)
+
+# 7.  generate GBM predicted values and probabilities with with `predict()`
+```{r}
+set.seed(1)
+gbm.pred <- predict(gbm.fit2, test.set)
+gbm.prob <- predict(gbm.fit2, test.set, type="prob")
+```
+
+`predict()` = predictions of various model fitting functions
+
+### 7.1 view GBM final model
+```{r}
+gbm.cm <- confusionMatrix(gbm.pred, test.set$lfp)
+gbm.cm
+```
+
+A confusion/error matrix is a cross-tabulation of observed versus predicted classes
+
+# 8.  plot GBM ROC curve
+```{r}
+library(pROC)
+rocCurve <- roc(response=test.set$lfp,
+	predictor = gbm.prob[, "yes"],
+	levels = rev(levels(test.set$lfp)),
+	auc=TRUE, ci=TRUE)
+```
+
+```{r}
+plot(rocCurve, main="GBM", col="blue", col.main="blue", col.lab="blue")
+```
+
+# Help
+* The [caret help page](https://topepo.github.io/caret/)
+
+* [Package 'caret](https://cran.r-project.org/web/packages/caret/caret.pdf)
+
+* Kuhn M. 2008. [Building predictive models in R using the caret package](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&ved=0ahUKEwiytr_K0YjPAhVjImMKHTdwCaMQFgghMAA&url=https%3A%2F%2Fwww.jstatsoft.org%2Farticle%2Fview%2Fv028i05%2Fv28i05.pdf&usg=AFQjCNF6qKoSkwaevSrCzgHwKWOyGqnmMQ&cad=rja). J Stat Softw 28:1-26.
+
+* Kuhn M. 2013. [Predictive modeling with R and the caret package](https://www.r-project.org/nosvn/conferences/useR-2013/Tutorials/kuhn/user_caret_2up.pdf). useR! The R User Conference, July 10-12, University of Castilla-La Mancha, Albacete, Spain
+
+* Kuhn M. 2015. [A Short Introduction to the caret Package](https://cran.r-project.org/web/packages/caret/vignettes/caret.pdf).  
