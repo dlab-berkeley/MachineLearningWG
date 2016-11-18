@@ -8,7 +8,7 @@ Fall 2016 Schedule
 * October 7 - [Decision trees](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/MLWG_Fall2016/oct13_decisionTrees)
 * October 21 - [Random forests](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/MLWG_Fall2016/oct21_randomForests)
 * November 4 - [Penalized regression](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/MLWG_Fall2016/nov4_LASSO) - lasso, ridge, elastic net
-* November 18 - Evan's skull dataset and GBM
+* November 18 - [Evan's skull dataset and GBM](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/MLWG_Fall2016/nov18_GBM)
 * December 2
 
 Spring 2017 Schedule - to be determined, topics welcome!
