@@ -7,8 +7,8 @@ Fridays: February 3, February 17, March 3, March 17, April 14, April 28, (one mo
 Spring 2017 Schedule  
 
 * February 3 - Introductory meeting and k-nearest neighbor clustering  
-[in R](https://www.datacamp.com/community/tutorials/machine-learning-in-r#gs.GpuyCu0)  
-[in Python](http://scikit-learn.org/stable/modules/neighbors.html)
+[click for KNN example in R](https://www.datacamp.com/community/tutorials/machine-learning-in-r#gs.GpuyCu0)  
+[click for KNN example in Python](http://scikit-learn.org/stable/modules/neighbors.html)
 
 * February 17 - Stepwise regression  
 
