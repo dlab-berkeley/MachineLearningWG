@@ -22,6 +22,8 @@ Spring 2017 Schedule
 
 We are always looking for student/staff/faculty presenters. Please contact the D-Lab if you are interested!  
 
+If you are interested in decision trees, random forests, penalized regression, and boosting, please see the Fall 2016 repo located [here](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/MLWG_Fall2016)  
+
 More information on the [D-Lab website](http://dlab.berkeley.edu/working-groups/machine-learning-working-group)
 
 ## Resources
