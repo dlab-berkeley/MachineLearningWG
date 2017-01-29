@@ -1,26 +1,17 @@
-# Machine Learning Working Group  
+# Machine Learning Working Group
 
-Fridays: February 3, February 17, March 3, March 17, April 14, April 28, (one more special topic meeting, TBD?)  
+Fridays, 12-1pm in 356 Barrows Hall
 
-12:30-2pm in 356 Barrows Hall  
+Fall 2016 Schedule
 
-Spring 2017 Schedule  
+* September 23 - Introductory meeting
+* October 7 - [Decision trees](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/MLWG_Fall2016/oct13_decisionTrees)
+* October 21 - [Random forests](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/MLWG_Fall2016/oct21_randomForests)
+* November 4 - [Penalized regression](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/MLWG_Fall2016/nov4_LASSO) - lasso, ridge, elastic net
+* November 18 - [Evan's skull dataset and GBM](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/MLWG_Fall2016/nov18_GBM)
+* December 2
 
-* February 3 - Introductory meeting and k-nearest neighbor clustering  
-[in R](https://www.datacamp.com/community/tutorials/machine-learning-in-r#gs.GpuyCu0)  
-[in Python](http://scikit-learn.org/stable/modules/neighbors.html)
-
-* February 17 - Stepwise regression  
-
-* March 3 - Splines, multivariate adaptive regression splines, generalized additive models  
-
-* March 17 - Bayesian additive regression trees  
-
-* April 14 - Support vector machines  
-
-* April 28 - Neural networks  
-
-We are always looking for student/staff/faculty presenters. Please contact the D-Lab if you are interested!  
+Spring 2017 Schedule - to be determined, topics welcome!
 
 More information on the [D-Lab website](http://dlab.berkeley.edu/working-groups/machine-learning-working-group)
 
@@ -48,7 +39,7 @@ Coursera and other online classes
 
 D-Lab Machine Learning Trainings
 
-* D-Lab - Intro to Machine Learning in R
+* D-Lab - Intro to Machine Learning
 * Erin LeDell - h2o.ai
 * Rochelle Terman - scikit-learn
 
@@ -56,7 +47,7 @@ D-Lab Machine Learning Trainings
 
 Other Campus Groups
 
-* [Machine Learning @ Berkeley](https://ml.berkeley.edu/)  
-* [D-Lab's Cloud Computing Working Group](http://dlab.berkeley.edu/working-groups/cloud-working-group)  
-* [D-Lab's Computational Text Analysis Working Group](http://dlabctawg.github.io/)  
+* [Machine Learning @ Berkeley](https://ml.berkeley.edu/)
+* D-Lab's Cloud Computing Working Group
+* D-Lab's Computational Text Analysis Working Group
 * [The Hacker Within](http://www.thehackerwithin.org/berkeley/) / Berkeley Institute for Data Science
