@@ -1,0 +1,182 @@
+---
+title: "k-nearest neighbor clustering"
+author: "Evan Muzzall"
+date: "2/3/2017"
+output: 
+  html_document: 
+    toc: yes
+    toc_float: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width=6, fig.height=6)
+```
+
+#0. Package installation
+If you don't have them already installed, you should make sure you have installed and queried these R packages. Today, we will use "class", "gmodels", and "MASS". 
+```{r, eval=FALSE}
+install.packages(c("caret", "class", "dplyr", "ggplot2", "gmodels", "MASS", "SuperLearner"), dependencies=TRUE)
+library(caret)
+library(class)
+library(dplyr)
+library(ggplot2)
+library(gmodels)
+library(MASS)
+library(SuperLearner)
+```
+
+#1. What is k-Nearest Neighbor clustering?
+kNN is a form of "lazy" learning in which data are categorized based on their their classifier similarities to their "nearest" neighbors. kNN can be thought of as non-parametric instance-based learning. By comparison with other algorithms, KNN is simple and makes no assumptions about the underlying data structure.  
+
+The data are treated as coordinates in a multidimensional feature space to organize the desired groups that we identify. kNN is distance-based which and distills variation contained within multiple variables into a few principal axes for ease of graphical representation.  
+
+Euclidean (straight-line Cartesian) distance is one standard for KNN and the distance we will use today. However, many consider Mahalanobis distance a more appropriate multivariate distance for kNN and other statistical tests. See for example:  
+
+[Weinberger et al. 2009. Distance Metric Learning for Large Margin
+Nearest Neighbor Classification. Journal of Machine Learning Reseach 10: 207-244](http://jmlr.csail.mit.edu/papers/volume10/weinberger09a/weinberger09a.pdf)
+
+#2. The data
+Load the "Boston" housing dataset from the "MASS" R package and check it out:
+```{r}
+library(MASS)
+data(Boston)
+
+head(Boston)
+?Boston
+str(Boston)
+```
+
+Time to get creative! Let's do a little data cleaning to coerce the "dis" variable (weighted mean of distances to five Boston employment centers) into a factor category. The distances will now be categorized as "short", "medium", or "long". 
+```{r}
+summary(Boston$dis)
+Boston$dis <- cut(Boston$dis, 
+                  breaks=c(0, 3, 6, 13),
+                  levels=c(1,2,3),
+                  labels=c("short", "medium", "long"))
+str(Boston)
+head(Boston, 10)
+Boston$dis
+table(Boston$dis)
+```
+
+#3. Choosing a proper k
+The "k" in kNN represents the number of other "neighboring" data points used to classify the point in question. Consider the bias-variance tradeoff when choosing a proper "k".  
+
+[Click here for Jason Brownlee's excellent introduction to the bias-variance tradeoff](http://machinelearningmastery.com/gentle-introduction-to-the-bias-variance-trade-off-in-machine-learning/)  
+
+For example, **if we choose a large "k",** it is easy for the majority class to always win because they always get the most votes, and the "nearest neighbors" would not exert their proper influence. Or, **if we choose a tiny "k",** noise and outliers could unduly influence the classification of the point being classified, again disregarding the influence of the other "nearest neighbors".  
+
+A larger "k" will likely produce a more linear decision boundary, while a smaller "k" will produce a more wiggly decision boundary representative of a more careful fit to training data.  
+
+For our example, we will set it to the square root of the number of training examples (see below). However, this might not result in the best "k". You could even run multiple examples to see which one offers the best performance, or ascribe nearer neighbors a greater decision weight.  
+
+#4. Split the data
+Now, use caret's handy `createDataPartition` funciton to conduct a stratified random split and divide the Boston data into train and test sets. We choose to put 70% of the data into the training set, and the remaining 30% into the test set. Also create label vectors to be used as identifiers in the classification process.
+```{r}
+library(caret)
+set.seed(1)
+split <- createDataPartition(Boston$dis, p=0.70, list=FALSE)
+train <- Boston[split, ]
+test <- Boston[-split, ]
+
+train_labels <- train[,8]
+test_labels <- test[,8]
+```
+
+#5. Train the model
+Time to classify! Fit the model to the training data using the `knn` function from the "class" package. This outputs a vector of the predicted classifications. However, let's first choose a "k" using the square root method:
+```{r}
+library(class)
+?knn # (click the option from the "class" library)
+
+round(sqrt(nrow(train)),2) # 18.84
+
+set.seed(1)
+Boston_p <- knn(train=train[,-8], test=test[,-8], cl=train_labels, k=19, prob=TRUE)
+```
+
+###5b. Evaluate its performance
+How did it do? Check out its performance on the test set using the `CrossTable` function from the "class" package:
+```{r}
+library(gmodels)
+CrossTable(x=test_labels, y=Boston_p, 
+           prop.chisq=FALSE,
+           prop.r=FALSE,
+           prop.c=FALSE,
+           prop.t=FALSE)
+```
+Not bad!  
+
+- short: 64/72 correctly classified as short  
+- medium: 38/53 correctly classified as medium  
+- long: 16/26 correctly classified as long  
+
+> NOTE: remember that the breaks specified in the cut function above were arbitrary for this toy example. 
+
+###5c. Improve model performance
+#####1. Normalize the data
+We don't want larger values to indiscriminately affect results. Let's standardize the data to a normal range so that their contributions to the decision-making process become roughly equal.  
+
+Let's use [z-scores](http://www.statsdirect.com/help/data_preparation/transform_z_scores.htm). Let's name this scaled dataframe "B":
+```{r}
+B <- Boston
+B[,-8] <- round(scale(Boston[,-8], center=TRUE, scale=TRUE), 2)
+head(B, 10)
+```
+
+Re-split the data using this z-score transformed "B" dataframe: 
+```{r}
+set.seed(1)
+split_Z <- createDataPartition(B$dis, p=0.70, list=FALSE)
+train_Z <- B[split_Z, ]
+test_Z <- B[-split_Z, ]
+
+train_labels_Z <- train_Z[,8]
+test_labels_Z <- test_Z[,8]
+```
+
+Fit the model again:
+```{r}
+set.seed(1)
+B_p <- knn(train=train_Z[,-8], test=test_Z[,-8], cl=train_labels_Z, k=19, prob=TRUE)
+
+CrossTable(x=test_labels_Z, y=B_p, 
+           prop.chisq=FALSE,
+           prop.r=FALSE,
+           prop.c=FALSE,
+           prop.t=FALSE)
+```
+How did we do? 
+- short: 58/72 correctly classified as short  
+- medium: 39/53 correctly classified as medium  
+- long: 18/26 correctly misclassified as long  
+
+#####2. Change "k"
+We can also change "k" to evaluate model performance. Ideally you would examine many different k-values using the ["SuperLearner" R package](https://cran.r-project.org/web/packages/SuperLearner/index.html), but for today let's just try a few extremes:
+```{r}
+B_p_k2 <- knn(train=train_Z[,-8], test=test_Z[,-8], cl=train_labels_Z, k=2, prob=TRUE)
+B_p_k100 <- knn(train=train_Z[,-8], test=test_Z[,-8], cl=train_labels_Z, k=100, prob=TRUE)
+
+CrossTable(x=test_labels_Z, y=B_p_k2, 
+           prop.chisq=FALSE,
+           prop.r=FALSE,
+           prop.c=FALSE,
+           prop.t=FALSE)
+
+CrossTable(x=test_labels_Z, y=B_p_k100, 
+           prop.chisq=FALSE,
+           prop.r=FALSE,
+           prop.c=FALSE,
+           prop.t=FALSE)
+ 
+```
+
+#6. Plot it! 
+```{r}
+# to be sleuthed ... (?)
+```
+
+Materials compiled from:
+- Lantz, Brett. 2013. Machine Learning with R. Birmingham, UK: Packt Publishing, Ltd.  
+- James et al...
+
