@@ -5,11 +5,11 @@ date: "2/3/2017"
 output: 
   html_document: 
     toc: yes
-    toc_float: no
+    toc_float: yes
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, fig.width=6, fig.height=6)
+knitr::opts_chunk$set(echo = TRUE, fig.width=9, fig.height=6, width=160)
 ```
 
 #0. Package installation
@@ -55,7 +55,6 @@ Boston$dis <- cut(Boston$dis,
                   labels=c("short", "medium", "long"))
 str(Boston)
 head(Boston, 10)
-Boston$dis
 table(Boston$dis)
 ```
 
@@ -95,7 +94,7 @@ set.seed(1)
 Boston_p <- knn(train=train[,-8], test=test[,-8], cl=train_labels, k=19, prob=TRUE)
 ```
 
-###5b. Evaluate its performance
+###5.1. Evaluate its performance
 How did it do? Check out its performance on the test set using the `CrossTable` function from the "class" package:
 ```{r}
 library(gmodels)
@@ -113,18 +112,21 @@ Not bad!
 
 > NOTE: remember that the breaks specified in the cut function above were arbitrary for this toy example. 
 
-###5c. Improve model performance
+###5.2. Improve model performance
 #####1. Normalize the data
-We don't want larger values to indiscriminately affect results. Let's standardize the data to a normal range so that their contributions to the decision-making process become roughly equal.  
+We don't want larger values to indiscriminately affect results. Let's standardize the data to a normal range so that their contributions to the decision-making process become roughly equal. We can do this with `scale`:
+```{r, eval=FALSE}
+?scale
+```
 
-Let's use [z-scores](http://www.statsdirect.com/help/data_preparation/transform_z_scores.htm). Let's name this scaled dataframe "B":
+Let's name this scaled dataframe "B":
 ```{r}
 B <- Boston
-B[,-8] <- round(scale(Boston[,-8], center=TRUE, scale=TRUE), 2)
+B[,-8] <- scale(Boston[,-8], center=TRUE, scale=TRUE)
 head(B, 10)
 ```
 
-Re-split the data using this z-score transformed "B" dataframe: 
+Re-split the data using this transformed "B" dataframe: 
 ```{r}
 set.seed(1)
 split_Z <- createDataPartition(B$dis, p=0.70, list=FALSE)
@@ -149,7 +151,7 @@ CrossTable(x=test_labels_Z, y=B_p,
 How did we do? 
 - short: 58/72 correctly classified as short  
 - medium: 39/53 correctly classified as medium  
-- long: 18/26 correctly misclassified as long  
+- long: 17/26 correctly misclassified as long  
 
 #####2. Change "k"
 We can also change "k" to evaluate model performance. Ideally you would examine many different k-values using the ["SuperLearner" R package](https://cran.r-project.org/web/packages/SuperLearner/index.html), but for today let's just try a few extremes:
@@ -171,12 +173,35 @@ CrossTable(x=test_labels_Z, y=B_p_k100,
  
 ```
 
-#6. Plot it! 
-```{r}
-# to be sleuthed ... (?)
+#6. Another method with a nice plotting function:
+Install and `library` the [chemometrics R package](https://cran.r-project.org/web/packages/chemometrics/index.html)
+```{r, eval=FALSE}
+install.packages("chemometrics", dependencies=TRUE)
+library(chemometrics)
 ```
 
-Materials compiled from:
-- Lantz, Brett. 2013. Machine Learning with R. Birmingham, UK: Packt Publishing, Ltd.  
-- James et al...
+Tidy the data a bit:
+```{r}
+grp <- Boston$dis
+X <- scale(Boston[-8], center=TRUE, scale=TRUE)
+k <- length(unique(grp))
+dat <- data.frame(grp, X)
+n <- nrow(X)
+n_train <- round(n*2/3)
 
+set.seed(123)
+train=sample(1:n,n_train)
+```
+###6.1 plot the cross-validated errors
+```{r}
+library(chemometrics)
+#pdf("kNNplot.pdf", 9, 6)
+resknn <- knnEval(X, grp, train, knnvec=seq(1,50, by=1), legpo="bottomright", las=2)
+title("kNN classification")
+#dev.off()
+```
+
+Materials compiled from:  
+[-Lantz, Brett. 2013. Machine Learning with R. Birmingham, UK: Packt Publishing, Ltd.](https://www.amazon.com/Machine-Learning-Second-Brett-Lantz/dp/1784393908)  
+[-James G, Witten D, Hastie T, Tibshirani R. 2015. An Introduction to Statistical Learning - with applications in R, 6th ed. Springer: New York](http://www-bcf.usc.edu/~gareth/ISL/ISLR%20Sixth%20Printing.pdf)  
+[-knnEval help page](https://artax.karlin.mff.cuni.cz/r-help/library/chemometrics/html/knnEval.html)  
