@@ -92,12 +92,12 @@ test_labels <- test[,8]
 #5. Train the model
 Time to classify! Fit the model to the training data using the `knn` function from the "class" package. This outputs a vector of the predicted classifications. However, let's first choose a "k" using the square root method:
 ```{r, eval=FALSE}
-library(class)
 ?knn # (click the option from the "class" library)
 ```
 ```{r}
 round(sqrt(nrow(train)),2) # 18.84
 
+library(class)
 set.seed(1)
 Boston_p <- knn(train=train[,-8], test=test[,-8], cl=train_labels, k=19, prob=TRUE)
 ```
