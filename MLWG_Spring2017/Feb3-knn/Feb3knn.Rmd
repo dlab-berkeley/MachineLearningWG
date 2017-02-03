@@ -13,22 +13,23 @@ knitr::opts_chunk$set(echo = TRUE, fig.width=9, fig.height=6, width=160)
 ```
 
 #0. Package installation
-If you don't have them already installed, you should make sure you have installed and queried these R packages. Today, we will use "class", "gmodels", and "MASS". 
+Today we will use the following packages. Although we won't use it today, we recommend installing "SuperLearner" as well. 
 ```{r, eval=FALSE}
-install.packages(c("caret", "class", "dplyr", "ggplot2", "gmodels", "MASS", "SuperLearner"), dependencies=TRUE)
+install.packages(c("caret", "chemometrics", "class", "FNN", "gmodels", "ggplot2", "MASS", "SuperLearner"), dependencies=TRUE)
 library(caret)
+library(chemometrics)
 library(class)
-library(dplyr)
-library(ggplot2)
+library(FNN)
 library(gmodels)
+library(ggplot2)
 library(MASS)
 library(SuperLearner)
 ```
 
-#1. What is k-Nearest Neighbor clustering?
-kNN is a form of "lazy" learning in which data are categorized based on their their classifier similarities to their "nearest" neighbors. kNN can be thought of as non-parametric instance-based learning. By comparison with other algorithms, KNN is simple and makes no assumptions about the underlying data structure.  
+#1. What is k-Nearest Neighbor clustering? (kNN)
+kNN is a form of "lazy" learning in which data are categorized based on similarities with their "nearest" neighbors. kNN can be thought of as non-parametric instance-based learning. Compared to other algorithms, KNN is simple and makes no assumptions about the underlying data structure.  
 
-The data are treated as coordinates in a multidimensional feature space to organize the desired groups that we identify. kNN is distance-based which and distills variation contained within multiple variables into a few principal axes for ease of graphical representation.  
+The data are treated as coordinates in a multidimensional feature space to organize the desired groups that are identified. kNN is distance-based and distills variation contained within multiple variables into a reduced number of principal axes.  
 
 Euclidean (straight-line Cartesian) distance is one standard for KNN and the distance we will use today. However, many consider Mahalanobis distance a more appropriate multivariate distance for kNN and other statistical tests. See for example:  
 
@@ -40,22 +41,30 @@ Load the "Boston" housing dataset from the "MASS" R package and check it out:
 ```{r}
 library(MASS)
 data(Boston)
-
+```
+```{r, eval=FALSE}
 head(Boston)
 ?Boston
 str(Boston)
 ```
 
-Time to get creative! Let's do a little data cleaning to coerce the "dis" variable (weighted mean of distances to five Boston employment centers) into a factor category. The distances will now be categorized as "short", "medium", or "long". 
+Today we will walk through classification and then regression using kNN. For classification, we want the response variable to be a factor. For regression, we want the response variable to remain numeric. Thus, we will first make a copy of the "Boston" dataset for the regression, before we arbitrarily convert it to a factor for classification:
+```{r}
+B_reg <- Boston
+```
+
+Time to get creative! Let's do a little data wrangling and coerce the "dis" variable (weighted mean of distances to five Boston employment centers) into a factor category. The distances will now be categorized as "short", "medium", or "long". 
 ```{r}
 summary(Boston$dis)
 Boston$dis <- cut(Boston$dis, 
                   breaks=c(0, 3, 6, 13),
                   levels=c(1,2,3),
                   labels=c("short", "medium", "long"))
+table(Boston$dis)
+```
+```{r, eval=FALSE}
 str(Boston)
 head(Boston, 10)
-table(Boston$dis)
 ```
 
 #3. Choosing a proper k
@@ -63,14 +72,11 @@ The "k" in kNN represents the number of other "neighboring" data points used to 
 
 [Click here for Jason Brownlee's excellent introduction to the bias-variance tradeoff](http://machinelearningmastery.com/gentle-introduction-to-the-bias-variance-trade-off-in-machine-learning/)  
 
-For example, **if we choose a large "k",** it is easy for the majority class to always win because they always get the most votes, and the "nearest neighbors" would not exert their proper influence. Or, **if we choose a tiny "k",** noise and outliers could unduly influence the classification of the point being classified, again disregarding the influence of the other "nearest neighbors".  
+For example, **if we choose a large "k",** it is easy for the majority class to win because it will always get the most votes and the "nearest neighbors" would not exert their proper influence. Or, **if we choose a tiny "k",** noise and outliers could unduly influence the classification of the point being classified, again disregarding the influence of the other "nearest neighbors".  
 
-A larger "k" will likely produce a more linear decision boundary, while a smaller "k" will produce a more wiggly decision boundary representative of a more careful fit to training data.  
-
-For our example, we will set it to the square root of the number of training examples (see below). However, this might not result in the best "k". You could even run multiple examples to see which one offers the best performance, or ascribe nearer neighbors a greater decision weight.  
-
+For our example, we will set "k" to the square root of the number of training observations (see below). However, this might not result in the best "k". Thus, we will perform cross-validation on 1:50 "k's" to see how misclassification error varies across the different k-values.  
 #4. Split the data
-Now, use caret's handy `createDataPartition` funciton to conduct a stratified random split and divide the Boston data into train and test sets. We choose to put 70% of the data into the training set, and the remaining 30% into the test set. Also create label vectors to be used as identifiers in the classification process.
+Now, use caret's handy `createDataPartition` funciton to conduct a stratified random split and divide the Boston data into train and test sets. We choose to put 70% of the data into the training set, and the remaining 30% into the test set. Also create label vectors to be used as identifiers in the classification process:
 ```{r}
 library(caret)
 set.seed(1)
@@ -104,8 +110,6 @@ CrossTable(x=test_labels, y=Boston_p,
            prop.c=FALSE,
            prop.t=FALSE)
 ```
-Not bad!  
-
 - short: 64/72 correctly classified as short  
 - medium: 38/53 correctly classified as medium  
 - long: 16/26 correctly classified as long  
@@ -123,6 +127,8 @@ Let's name this scaled dataframe "B":
 ```{r}
 B <- Boston
 B[,-8] <- scale(Boston[,-8], center=TRUE, scale=TRUE)
+```
+```{r, eval=FALSE}
 head(B, 10)
 ```
 
@@ -153,19 +159,19 @@ How did we do?
 - medium: 39/53 correctly classified as medium  
 - long: 17/26 correctly misclassified as long  
 
-#####2. Change "k"
-We can also change "k" to evaluate model performance. Ideally you would examine many different k-values using the ["SuperLearner" R package](https://cran.r-project.org/web/packages/SuperLearner/index.html), but for today let's just try a few extremes:
+#####5.3. Change "k"
+We can also change "k" to evaluate model performance. Ideally you would examine many a variety of kNN k-values and other algorithms simultaneously using the ["SuperLearner" R package](https://cran.r-project.org/web/packages/SuperLearner/index.html), but for today let's just try a few extremes:
 ```{r}
 B_p_k2 <- knn(train=train_Z[,-8], test=test_Z[,-8], cl=train_labels_Z, k=2, prob=TRUE)
 B_p_k100 <- knn(train=train_Z[,-8], test=test_Z[,-8], cl=train_labels_Z, k=100, prob=TRUE)
 
-CrossTable(x=test_labels_Z, y=B_p_k2, 
+CrossTable(x=test_labels_Z, y=B_p_k2,  # k=2
            prop.chisq=FALSE,
            prop.r=FALSE,
            prop.c=FALSE,
            prop.t=FALSE)
 
-CrossTable(x=test_labels_Z, y=B_p_k100, 
+CrossTable(x=test_labels_Z, y=B_p_k100,  # k=100
            prop.chisq=FALSE,
            prop.r=FALSE,
            prop.c=FALSE,
@@ -174,31 +180,72 @@ CrossTable(x=test_labels_Z, y=B_p_k100,
 ```
 
 #6. Another method with a nice plotting function:
-Install and `library` the [chemometrics R package](https://cran.r-project.org/web/packages/chemometrics/index.html)
-```{r, eval=FALSE}
-install.packages("chemometrics", dependencies=TRUE)
-library(chemometrics)
-```
-
-Tidy the data a bit:
+Tidy the transformed "B" data a little:
 ```{r}
-grp <- Boston$dis
-X <- scale(Boston[-8], center=TRUE, scale=TRUE)
+grp <- B$dis
+X <- scale(B[-8], center=TRUE, scale=TRUE)
 k <- length(unique(grp))
 dat <- data.frame(grp, X)
 n <- nrow(X)
 n_train <- round(n*2/3)
 
 set.seed(123)
-train=sample(1:n,n_train)
+train_plot=sample(1:n,n_train)
 ```
-###6.1 plot the cross-validated errors
+###6.1 Plot the cross-validated errors
 ```{r}
 library(chemometrics)
 #pdf("kNNplot.pdf", 9, 6)
-resknn <- knnEval(X, grp, train, knnvec=seq(1,50, by=1), legpo="bottomright", las=2)
+resknn <- knnEval(X, grp, train_plot, knnvec=seq(1,50, by=1), legpo="bottomright", las=2)
 title("kNN classification")
 #dev.off()
+```
+
+###7. Regression example
+For the regression, let's return to the B_reg copy that we made at the beginning because it preserved the numeric class of the "dis" variable. 
+
+First, scale the data that now contains the numeric response variable:
+```{r}
+B_reg <- as.data.frame(scale(B_reg, center=TRUE, scale=TRUE)) # transform the data
+```
+
+Second, split the data again: 
+```{r}
+library(caret)
+set.seed(1)
+split_reg <- createDataPartition(B_reg$dis, p=0.70, list=FALSE) # split
+train_reg <- B_reg[split,]
+test_reg <- B_reg[-split,]
+```
+
+Third, fit the model and plot it!
+```{r}
+library(FNN)
+set.seed(1)
+knn_reg <- knn.reg(train_reg[,-8], test=NULL, y=train_reg[,8], k=3)
+plot(train_reg[,8], knn_reg$pred, xlab="y", ylab=expression(hat(y)))
+```
+
+Or, use ggplot2 :) 
+```{r}
+library(ggplot2)
+gg_df <- data.frame(train_reg[,8], knn_reg$pred)
+colnames(gg_df) <- c("distance", "predictions")
+str(gg_df)
+
+gg <- ggplot(gg_df, aes(distance, predictions, color=distance)) + 
+  geom_point() + 
+  theme_bw() + 
+  xlab("y") + 
+  ylab(expression(hat("y"))) +
+  ggtitle("kNN regression") + 
+  scale_color_continuous(low="yellow", high="red")
+
+c <- coef(lm(predictions ~ distance, data=gg_df)) # compute intercept and slope to plot ab line
+c
+class(c) 
+
+gg + geom_abline(intercept=c[1], slope=c[2], col="green3")
 ```
 
 Materials compiled from:  
