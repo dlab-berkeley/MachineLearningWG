@@ -65,6 +65,7 @@ table(Boston$dis)
 ```{r, eval=FALSE}
 str(Boston)
 head(Boston, 10)
+levels(Boston$dis)
 ```
 
 #3. Choosing a proper k
@@ -90,7 +91,7 @@ test_labels <- test[,8]
 
 #5. Train the model
 Time to classify! Fit the model to the training data using the `knn` function from the "class" package. This outputs a vector of the predicted classifications. However, let's first choose a "k" using the square root method:
-```{r}
+```{r, eval=FALSE}
 library(class)
 ?knn # (click the option from the "class" library)
 ```
@@ -102,7 +103,7 @@ Boston_p <- knn(train=train[,-8], test=test[,-8], cl=train_labels, k=19, prob=TR
 ```
 
 ###5.1. Evaluate its performance
-How did it do? Check out its performance on the test set using the `CrossTable` function from the "class" package:
+How did it do? Check out its performance on the test set using the `CrossTable` function from the "gmodels" package:
 ```{r}
 library(gmodels)
 CrossTable(x=test_labels, y=Boston_p, 
@@ -111,18 +112,13 @@ CrossTable(x=test_labels, y=Boston_p,
            prop.c=FALSE,
            prop.t=FALSE)
 ```
-- short: 64/72 correctly classified as short  
-- medium: 38/53 correctly classified as medium  
-- long: 16/26 correctly classified as long  
+How did it do?   
 
-> NOTE: remember that the breaks specified in the cut function above were arbitrary for this toy example. 
+> NOTE: remember that the breaks specified in the cut function above were arbitrary for this toy example. You will probably want to make more informed decisions for your thesis, dissertation, and other professional work!  
 
 ###5.2. Improve model performance
 #####1. Normalize the data
-We don't want larger values to indiscriminately affect results. Let's standardize the data to a normal range so that their contributions to the decision-making process become roughly equal. We can do this with `scale`:
-```{r, eval=FALSE}
-?scale
-```
+We don't want larger values to indiscriminately affect results. Let's standardize the data to a normal range so that their contributions to the decision-making process become roughly equal. We can do this with `scale`:  
 
 Let's name this scaled dataframe "B":
 ```{r}
@@ -136,49 +132,47 @@ head(B, 10)
 Re-split the data using this transformed "B" dataframe: 
 ```{r}
 set.seed(1)
-split_Z <- createDataPartition(B$dis, p=0.70, list=FALSE)
-train_Z <- B[split_Z, ]
-test_Z <- B[-split_Z, ]
+split_scale <- createDataPartition(B$dis, p=0.70, list=FALSE)
+train_scale <- B[split_scale, ]
+test_scale <- B[-split_scale, ]
 
-train_labels_Z <- train_Z[,8]
-test_labels_Z <- test_Z[,8]
+train_labels_scale <- train_scale[,8]
+test_labels_scale <- test_scale[,8]
 ```
 
 Fit the model again:
 ```{r}
 set.seed(1)
-B_p <- knn(train=train_Z[,-8], test=test_Z[,-8], cl=train_labels_Z, k=19, prob=TRUE)
+B_p <- knn(train=train_scale[,-8], test=test_scale[,-8], cl=train_labels_scale, k=19, prob=TRUE)
 
-CrossTable(x=test_labels_Z, y=B_p, 
+CrossTable(x=test_labels_scale, y=B_p, 
            prop.chisq=FALSE,
            prop.r=FALSE,
            prop.c=FALSE,
            prop.t=FALSE)
 ```
-How did we do? 
-- short: 58/72 correctly classified as short  
-- medium: 39/53 correctly classified as medium  
-- long: 17/26 correctly misclassified as long  
+How did it do?  
 
 #####5.3. Change "k"
-We can also change "k" to evaluate model performance. Ideally you would examine many a variety of kNN k-values and other algorithms simultaneously using the ["SuperLearner" R package](https://cran.r-project.org/web/packages/SuperLearner/index.html), but for today let's just try a few extremes:
+We can also change "k" to evaluate the performance of several models. Ideally, you would use the ["SuperLearner" R package](https://cran.r-project.org/web/packages/SuperLearner/index.html to examine a handful of kNN algorithms with different k-values simultaneously against other algorithms. Below we will examine a range of cross-validated k-values. For now, let's just try a few extremes:
 ```{r}
-B_p_k2 <- knn(train=train_Z[,-8], test=test_Z[,-8], cl=train_labels_Z, k=2, prob=TRUE)
-B_p_k100 <- knn(train=train_Z[,-8], test=test_Z[,-8], cl=train_labels_Z, k=100, prob=TRUE)
+B_p_k2 <- knn(train=train_scale[,-8], test=test_scale[,-8], cl=train_labels_scale, k=2, prob=TRUE)  # k=2
+B_p_k50 <- knn(train=train_scale[,-8], test=test_scale[,-8], cl=train_labels_scale, k=50, prob=TRUE)  # k=50
 
-CrossTable(x=test_labels_Z, y=B_p_k2,  # k=2
+CrossTable(x=test_labels_scale, y=B_p_k2,  # k=2
            prop.chisq=FALSE,
            prop.r=FALSE,
            prop.c=FALSE,
            prop.t=FALSE)
 
-CrossTable(x=test_labels_Z, y=B_p_k100,  # k=100
+CrossTable(x=test_labels_scale, y=B_p_k50,  # k=50
            prop.chisq=FALSE,
            prop.r=FALSE,
            prop.c=FALSE,
            prop.t=FALSE)
  
 ```
+What happened?  
 
 #6. Another method with a CV error plotting function
 Tidy the transformed "B" data a little:
@@ -191,23 +185,25 @@ n <- nrow(X)
 n_train <- round(n*2/3)
 
 set.seed(123)
-train_plot=sample(1:n,n_train)
+train_plot <- sample(1:n,n_train)
 ```
 ###6.1 Plot the cross-validated errors
 ```{r}
 library(chemometrics)
-#pdf("kNNplot.pdf", 9, 6)
-knn_k <- knnEval(X, grp, train_plot, knnvec=seq(1,50, by=1), legpo="bottomright", las=2)
+#pdf("kNN classification.pdf", 9, 6)
+knn_k <- knnEval(X, grp, train_plot, 
+                 knnvec=seq(1,50, by=1), 
+                 legpo="bottomright", las=2)
 title("kNN classification")
 #dev.off()
 ```
 
 #7. Regression example
-For the regression, let's return to the B_reg copy that we made at the beginning because it preserved the numeric class of the "dis" variable. 
+For the regression example, let's return to the B_reg copy of the Boston dataset that we made at the beginning because it preserved the numeric class of the "dis" variable. 
 
-First, scale the data that now contains the numeric response variable:
+First, scale the data:
 ```{r}
-B_reg <- as.data.frame(scale(B_reg, center=TRUE, scale=TRUE)) # transform the data
+B_reg <- as.data.frame(scale(B_reg, center=TRUE, scale=TRUE)) 
 ```
 
 Second, split the data again: 
@@ -246,7 +242,9 @@ c <- coef(lm(predictions ~ distance, data=gg_df)) # compute intercept and slope 
 c
 class(c) 
 
+#pdf("kNN regression.pdf", 9, 6)
 gg + geom_abline(intercept=c[1], slope=c[2], col="green3")
+#dev.off()
 ```
 
 Materials compiled from:  
