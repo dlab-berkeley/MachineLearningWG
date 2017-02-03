@@ -1,5 +1,5 @@
 ---
-title: "k-nearest neighbor clustering"
+title: "k-Nearest Neighbor clustering"
 author: "Evan Muzzall"
 date: "2/3/2017"
 output: 
@@ -251,4 +251,4 @@ gg + geom_abline(intercept=c[1], slope=c[2], col="green3")
 Materials compiled from:  
 [-Lantz, Brett. 2013. Machine Learning with R. Birmingham, UK: Packt Publishing, Ltd.](https://www.amazon.com/Machine-Learning-Second-Brett-Lantz/dp/1784393908)  
 [-James G, Witten D, Hastie T, Tibshirani R. 2015. An Introduction to Statistical Learning - with applications in R, 6th ed. Springer: New York](http://www-bcf.usc.edu/~gareth/ISL/ISLR%20Sixth%20Printing.pdf)  
-[-knnEval help page](https://artax.karlin.mff.cuni.cz/r-help/library/chemometrics/html/knnEval.html)  
+[-knnEval help page](https://artax.karlin.mff.cuni.cz/r-help/library/chemometrics/html/knnEval.html)
