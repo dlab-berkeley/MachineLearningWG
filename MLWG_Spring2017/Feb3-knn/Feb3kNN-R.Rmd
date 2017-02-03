@@ -247,7 +247,7 @@ gg + geom_abline(intercept=c[1], slope=c[2], col="green3")
 #dev.off()
 ```
 
-See the below links for information on plotting decision boundaries:
+See the below links for information on plotting decision boundaries:  
 [Stack Overflow - Variation on “How to plot decision boundary of a k-nearest neighbor classifier from Elements of Statistical Learning?”](http://stackoverflow.com/questions/31234621/variation-on-how-to-plot-decision-boundary-of-a-k-nearest-neighbor-classifier-f)  
 [Stack Overflow - How to plot decision boundary of a k-nearest neighbor classifier from Elements of Statistical Learning?](http://stats.stackexchange.com/questions/21572/how-to-plot-decision-boundary-of-a-k-nearest-neighbor-classifier-from-elements-o/21602#21602)  
 
