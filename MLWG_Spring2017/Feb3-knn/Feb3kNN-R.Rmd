@@ -156,10 +156,10 @@ How did it do?
 #####5.3. Change "k"
 We can also change "k" to evaluate the performance of several models. Ideally, you would use the ["SuperLearner" R package](https://cran.r-project.org/web/packages/SuperLearner/index.html to examine a handful of kNN algorithms with different k-values simultaneously against other algorithms. Below we will examine a range of cross-validated k-values. For now, let's just try a few extremes:
 ```{r}
-B_p_k2 <- knn(train=train_scale[,-8], test=test_scale[,-8], cl=train_labels_scale, k=2, prob=TRUE)  # k=2
+B_p_k1 <- knn(train=train_scale[,-8], test=test_scale[,-8], cl=train_labels_scale, k=1, prob=TRUE)  # k=1
 B_p_k50 <- knn(train=train_scale[,-8], test=test_scale[,-8], cl=train_labels_scale, k=50, prob=TRUE)  # k=50
 
-CrossTable(x=test_labels_scale, y=B_p_k2,  # k=2
+CrossTable(x=test_labels_scale, y=B_p_k1,  # k=1
            prop.chisq=FALSE,
            prop.r=FALSE,
            prop.c=FALSE,
@@ -246,6 +246,10 @@ class(c)
 gg + geom_abline(intercept=c[1], slope=c[2], col="green3")
 #dev.off()
 ```
+
+See the below links for information on plotting decision boundaries:
+[Stack Overflow - Variation on “How to plot decision boundary of a k-nearest neighbor classifier from Elements of Statistical Learning?”](http://stackoverflow.com/questions/31234621/variation-on-how-to-plot-decision-boundary-of-a-k-nearest-neighbor-classifier-f)  
+[Stack Overflow - How to plot decision boundary of a k-nearest neighbor classifier from Elements of Statistical Learning?](http://stats.stackexchange.com/questions/21572/how-to-plot-decision-boundary-of-a-k-nearest-neighbor-classifier-from-elements-o/21602#21602)  
 
 Materials compiled from:  
 [-Lantz, Brett. 2013. Machine Learning with R. Birmingham, UK: Packt Publishing, Ltd.](https://www.amazon.com/Machine-Learning-Second-Brett-Lantz/dp/1784393908)  
