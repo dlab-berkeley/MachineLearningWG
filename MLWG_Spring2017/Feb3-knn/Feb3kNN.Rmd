@@ -1,5 +1,5 @@
 ---
-title: "k-Nearest Neighbor clustering"
+title: "k-Nearest Neighbor classification and regression"
 author: "Evan Muzzall"
 date: "2/3/2017"
 output: 
@@ -26,7 +26,7 @@ library(MASS)
 library(SuperLearner)
 ```
 
-#1. What is k-Nearest Neighbor clustering? (kNN)
+#1. What is k-Nearest Neighbors? (kNN)
 kNN is a form of "lazy" learning in which data are categorized based on similarities with their "nearest" neighbors. kNN can be thought of as non-parametric instance-based learning. Compared to other algorithms, KNN is simple and makes no assumptions about the underlying data structure.  
 
 The data are treated as coordinates in a multidimensional feature space to organize the desired groups that are identified. kNN is distance-based and distills variation contained within multiple variables into a reduced number of principal axes.  
@@ -93,7 +93,8 @@ Time to classify! Fit the model to the training data using the `knn` function fr
 ```{r}
 library(class)
 ?knn # (click the option from the "class" library)
-
+```
+```{r}
 round(sqrt(nrow(train)),2) # 18.84
 
 set.seed(1)
@@ -179,7 +180,7 @@ CrossTable(x=test_labels_Z, y=B_p_k100,  # k=100
  
 ```
 
-#6. Another method with a nice plotting function:
+#6. Another method with a CV error plotting function
 Tidy the transformed "B" data a little:
 ```{r}
 grp <- B$dis
@@ -196,12 +197,12 @@ train_plot=sample(1:n,n_train)
 ```{r}
 library(chemometrics)
 #pdf("kNNplot.pdf", 9, 6)
-resknn <- knnEval(X, grp, train_plot, knnvec=seq(1,50, by=1), legpo="bottomright", las=2)
+knn_k <- knnEval(X, grp, train_plot, knnvec=seq(1,50, by=1), legpo="bottomright", las=2)
 title("kNN classification")
 #dev.off()
 ```
 
-###7. Regression example
+#7. Regression example
 For the regression, let's return to the B_reg copy that we made at the beginning because it preserved the numeric class of the "dis" variable. 
 
 First, scale the data that now contains the numeric response variable:
