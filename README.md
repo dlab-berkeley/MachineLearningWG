@@ -11,6 +11,11 @@ Spring 2017 Schedule
 [click for KNN example in Python](http://scikit-learn.org/stable/modules/neighbors.html)
 
 * February 17 - Stepwise regression  
+[see Chapter 6 from An Introudction to Statistical Learning for an overview of stepwise regression](http://www-bcf.usc.edu/~gareth/ISL/ISLR%20Sixth%20Printing.pdf)  
+
+[click for an overview of regerssion analysis in Python](http://www.turingfinance.com/regression-analysis-using-python-statsmodels-and-quandl/)  
+[click for an overview of generalized linear models in Python](http://scikit-learn.org/stable/modules/linear_model.html)
+
 
 * March 3 - Splines, multivariate adaptive regression splines, generalized additive models  
 
@@ -44,9 +49,12 @@ Courses at Berkeley:
 * PH 295 - Targeted Learning for Biomedical Big Data
 * INFO - TBD
 
-Coursera and other online classes
+Online classes
 
-* To add
+* [Coursera Data Science Specialization](https://www.coursera.org/specializations/jhu-data-science)
+* [edX - Principles of Machine Learning](https://www.edx.org/course/principles-machine-learning-microsoft-dat203-2x-2)
+
+* [edX - Applied Machine Learning](https://www.edx.org/course/applied-machine-learning-microsoft-dat203-3x-0)
 
 D-Lab Machine Learning Trainings
 
