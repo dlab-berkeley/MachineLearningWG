@@ -11,11 +11,10 @@ Spring 2017 Schedule
 [click for KNN example in Python](http://scikit-learn.org/stable/modules/neighbors.html)
 
 * February 17 - Stepwise regression  
-[see Chapter 6 from An Introudction to Statistical Learning for an overview of stepwise regression](http://www-bcf.usc.edu/~gareth/ISL/ISLR%20Sixth%20Printing.pdf)  
+[see Chapter 6 from An Introduction to Statistical Learning for an overview of stepwise regression](http://www-bcf.usc.edu/~gareth/ISL/ISLR%20Sixth%20Printing.pdf)  
 
 [click for an overview of regerssion analysis in Python](http://www.turingfinance.com/regression-analysis-using-python-statsmodels-and-quandl/)  
-[click for an overview of generalized linear models in Python](http://scikit-learn.org/stable/modules/linear_model.html)
-
+[click for an overview of generalized linear models in Python](http://scikit-learn.org/stable/modules/linear_model.html)  
 
 * March 3 - Splines, multivariate adaptive regression splines, generalized additive models  
 
