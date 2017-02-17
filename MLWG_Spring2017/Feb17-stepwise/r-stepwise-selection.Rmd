@@ -7,8 +7,8 @@ output: html_notebook
 
 Topics to cover:
 * Best subset selection
-* Forward stepwise selection
-* Backward stepwise selection
+* Forward selection
+* Backward selection
 * Cross-validation
 
 **R packages**
