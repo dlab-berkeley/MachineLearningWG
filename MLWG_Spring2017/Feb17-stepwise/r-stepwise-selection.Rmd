@@ -9,6 +9,7 @@ Topics to cover:
 * Best subset selection
 * Forward stepwise selection
 * Backward stepwise selection
+* Cross-validation
 
 **R packages**
 ```{r}
@@ -146,6 +147,11 @@ set.seed(1)
 sl = SuperLearner(Y, X, family = binomial(), SL.library = sl_lib)
 sl
 ```
+
+**Challenges**
+
+1. Add in one or two other algorithms we've used. How do they compare to stepwise?
+2. Look at the code for `SL.step.forward` and `SL.stepAIC` - any questions on how they work?
 
 ## Further reading
 
