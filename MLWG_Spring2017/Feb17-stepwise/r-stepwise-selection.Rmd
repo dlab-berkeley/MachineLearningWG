@@ -58,7 +58,7 @@ To generalize to any model size, if we have p covariates we would have to check 
 
 Stepwise selection is a simplification of best subset selection to make it computationally feasible for any number of covariates. It comes in three forms: forward, backward, and combined forward & backward. Confusingly, sometimes "stepwise" is meant to refer specifically to the "both" approach.
 
-`Forward selection` starts with just the intercept and considers which single variable to incorporate next. It loops over every variable, runs a regression with that variable plus the intercept, and chooses the variable with the best performance on a certain metric: $R^2$, [f-statistic](https://en.wikipedia.org/wiki/F-test), [Aikake Information Criterion](https://en.wikipedia.org/wiki/Akaike_information_criterion), or other preferred performance estimate. It then adds that variable to the model and considers the next variable to add, continuing to repeat until no remaining variable improves performance.
+`Forward selection` starts with just the intercept and considers which single variable to incorporate next. It loops over every variable, runs a regression with that variable plus the intercept, and chooses the variable with the best performance on a certain metric: adjusted $R^2$, [f-statistic](https://en.wikipedia.org/wiki/F-test#Regression_problems), [Aikake Information Criterion](https://en.wikipedia.org/wiki/Akaike_information_criterion), or other preferred performance estimate. It then adds that variable to the model and considers the next variable to add, continuing to repeat until no remaining variable improves performance.
 
 ## Clean dataset
 
