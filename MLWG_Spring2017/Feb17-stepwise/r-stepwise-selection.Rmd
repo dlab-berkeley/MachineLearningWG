@@ -141,8 +141,9 @@ step_reg
 
 **Challenges**
 
-1. Try running with `trace = 1` to see more details in the stepwise process.
-2. Try running with `direction = "backward"` and then `direction = "both"`. Hint: with backward you will need to change the first argument to use the full model rather than the intercept-only model.
+1. How similar are stepwise results compared to the significant covariates from the standard OLS we ran first? Hint: compare `step_reg` with `summary(largest_model)`.
+2. Try running with `trace = 1` to see more details in the stepwise process.
+3. Try running with `direction = "backward"` and then `direction = "both"` - do you get the same variables selected? Hint: with backward you will need to change the first argument to use the full model rather than the intercept-only model.
 
 ## Cross-validated comparison
 
