@@ -1,11 +1,14 @@
 ---
-title: ""
-output: html_notebook
+title: ''
+output:
+  html_document: default
+  html_notebook: default
 ---
 
 # Stepwise selection
 
 Topics to cover:
+
 * Best subset selection
 * Forward selection
 * Backward selection
