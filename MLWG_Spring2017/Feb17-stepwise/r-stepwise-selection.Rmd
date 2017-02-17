@@ -157,3 +157,5 @@ sl
 
 * Intro to Statistical Learning, section 6.1.2
 * ["What are some of the problems with stepwise regression?"](http://www.stata.com/support/faqs/statistics/stepwise-regression-problems/) [CK: note that they are assuming no cross-validation.]
+* [Regression Modeling Strategies](https://smile.amazon.com/Regression-Modeling-Strategies-Applications-Statistics-ebook/dp/B0140XQAXI), section 4.3.
+* [Statistical Learning from a Regression Perspective](https://smile.amazon.com/Statistical-Learning-Regression-Perspective-Statistics-ebook/dp/B01M333153) section 1.4.6.
