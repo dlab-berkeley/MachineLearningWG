@@ -156,3 +156,4 @@ sl
 ## Further reading
 
 * Intro to Statistical Learning, section 6.1.2
+* ["What are some of the problems with stepwise regression?"](http://www.stata.com/support/faqs/statistics/stepwise-regression-problems/) [CK: note that they are assuming no cross-validation.]
