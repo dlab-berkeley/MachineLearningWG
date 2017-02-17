@@ -56,7 +56,7 @@ The one with the best performance (e.g. cross-validated mean-squared error) is t
 
 To generalize to any model size, if we have p covariates we would have to check $2^p$ different combinations: each covariate is either included or not (2 possibilities), so combining that for all covariates we have the product of p twos: $2 * 2 * 2...$ which simplifies to $2^p$. With 10 covariates that is 1,024 models to check, with 20 covariates it's a million, etc.
 
-Stepwise selection is a simplification of best subset selection to make it computationally feasible for any number of covariates. It comes in three forms: forward, backward, and combined forward & backward.
+Stepwise selection is a simplification of best subset selection to make it computationally feasible for any number of covariates. It comes in three forms: forward, backward, and combined forward & backward. Confusingly, sometimes "stepwise" is meant to refer specifically to the "both" approach.
 
 `Forward selection` starts with just the intercept and considers which single variable to incorporate next. It loops over every variable, runs a regression with that variable plus the intercept, and chooses the variable with the best performance on a certain metric: $R^2$, [f-statistic](https://en.wikipedia.org/wiki/F-test), [Aikake Information Criterion](https://en.wikipedia.org/wiki/Akaike_information_criterion), or other preferred performance estimate. It then adds that variable to the model and considers the next variable to add, continuing to repeat until no remaining variable improves performance.
 
@@ -156,6 +156,7 @@ sl
 ## Further reading
 
 * Intro to Statistical Learning, section 6.1.2
+* Applied Predictive Modeling, chapter 19 "Feature Selection".
 * ["What are some of the problems with stepwise regression?"](http://www.stata.com/support/faqs/statistics/stepwise-regression-problems/) [CK: note that they are assuming no cross-validation.]
 * [Regression Modeling Strategies](https://smile.amazon.com/Regression-Modeling-Strategies-Applications-Statistics-ebook/dp/B0140XQAXI), section 4.3.
 * [Statistical Learning from a Regression Perspective](https://smile.amazon.com/Statistical-Learning-Regression-Perspective-Statistics-ebook/dp/B01M333153) section 1.4.6.
