@@ -1,0 +1,324 @@
+---
+title: "Multivariate adaptive regression splines and generalized additive models"
+author: "Evan Muzzall"
+date: "3/03/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Package installation
+We will use the following packages for this example:
+```{r}
+if (F) {
+  install.packages(c("devtools", "eartj", "ggplot2", "mgcv", "mlbench", "plotmo"))
+  devtools::install_github("ck37/ck37r")
+}
+
+library(ck37r)
+library(devtools)
+library(ggplot2)
+library(mgcv)
+library(mlbench)
+library(plotmo)
+library(earth)
+
+```
+
+## Goals
+Using the "PimaIndiansDiabetes2" dataset, construct splines, generalized additice models (GAMS), and multivariate additive regression models (MARS) to predict blood pressure via the other variables as predictors. Missing data will be median-imputed and indicators will be created to document their missingness.  
+
+## Preprocess the data
+```{r}
+# load the dataset
+data(PimaIndiansDiabetes2)
+?PimaIndiansDiabetes2
+data <- PimaIndiansDiabetes2 # give the data a simpler name
+str(data)
+```
+
+Check for missing data:
+```{r}
+# check for missing cases
+sum(is.na(data)) 
+
+# how much of the data is missing? 
+sum(is.na(data)) / (nrow(data)*ncol(data)) # about 9% 
+```
+
+Recode the "diabetes" vector to numeric type:
+```{r}
+data$diabetes <- ifelse(data$diabetes=="pos", 1, 0)
+```
+
+Use Chris K's handy median impute function to impute missing values: 
+```{r}
+# impute and add missingness indicators
+result = ck37r::impute_missing_values(data) 
+
+# overwrite "data" with new imputed data frame
+data <- result$data 
+```
+
+Double check that missing values have been imputed:
+```{r}
+# no more NA values
+sum(is.na(data))
+
+# check that missingness indicators have been added
+str(data)
+```
+
+Parse our data into our Y outcome variable and X predictor variables:
+```{r}
+# define Y
+pressure <- "pressure" # for Y and X assignment purposes
+Y <- data$pressure # for modeling purposes
+
+# define X predictors
+X <- data[, !names(data) == pressure]
+
+# double check that the "pressure" vector has been removed
+str(X)
+```
+
+## Beyond linear models
+So far, we have briefly covered linear models. However, these are potentially limited in their predictive power because they always assume linear relationships in the data. Last semester, we talked about improving linear regression models via penalized regression (LASSO and ridge) and this semester via stepwise selection (dividing the data into equal regions and fitting a function in "stepewise" fashion). However, these methods still make linear assumptions about the data and least squares are still used to estimate the regression coefficients.  
+
+There exist great variery of nonlinear regression methods, such as polynomial regression, step functions, regression splines, smoothing splines, local regression (LOESS), generalized additive models (GAMS), and multivariate additive regression models (MARS).  
+
+Regression splines are more flexible extensions of polynomial and piecewise regressions because they fit a polynomial funciton to the data within each piecewise region - constraints at region borders allow them to join smoothly. Smoothing splines are similar to this idea, but accept a smoothing penalty to adjust for minimization of their residual sum of square values. Local regression is yet another extension of these methods, except the fitted functions are allowed to overlap neighboring data regions.  
+
+Polynomial models provide a simple glimpse of how non-linear predictors are related to an outcome variable. For example:  
+```{r}
+# fit a 3rd degree polynomial regression
+poly1 <- lm(pressure ~ poly(glucose, 3), data=data)
+summary(poly1) # the output still resembles OLS regression
+
+plot(pressure~glucose, data=data) # plot the scatter
+
+points(data$glucose, fitted(poly1), col="blue", pch=20) # add the polynomial "curve"
+
+# how does this compare to a linear model? 
+
+# fit a linear model
+lm1 <- lm(pressure ~ glucose, data=data) 
+
+# view the coefficients for plotting
+lm1$coefficients
+
+# plot the linear best fit for comparison
+abline(lm1$coefficients[1], lm1$coefficients[2], col="red", lwd=2)
+```
+
+Although the linear and polynomial fits are similar, they are not identical and their fits change differently throughout the scatterplot. Thus, it is important to consider nonlinear relationships in your data even if linearity is assumed.  
+
+Furthermore, note that the polynomial function "curve" (the blue dots) is actually a series of points along fairly equally spaced intervals. To conceptualize "piecewise" regression methods, imagine that a straight line is connecting each of the blue dots in the polynomial "curve". This would instead create many connected lines where each point is a "knot" spaced out into equally spaced bins so that each directional change is a "hinge" in the line. Thus, the line is not continuous. To truly fit a curve that estimates nonlinear predictor relationships, you might want to instead utilize a smoothing function of some sort (see below).  
+
+## Regression splines
+Splines further extend the idea of polynomial and piecewise regression approaches to predict our outcome variable when the relationships among the predictors are nonlinear. Simply put, a spline is a curve that connects two or more points. This approach can more appropriately approximate the relationships in a dataset because it better "touches" more data points due to its curved nature (as opposed to a straight line).  
+
+See [Introduction to Statistical Learning by James, et al., 2013 - Chapter 7]() for detailed explanations and coding examples.  
+
+Let's fit a spline using our example from above:
+```{r}
+# fit a cubic smoothing spline
+smooth1 <- smooth.spline(y=data$pressure, x=data$glucose, 
+                         spar=NULL,
+                         cv=FALSE)
+smooth1
+plot(smooth1, main="smooth1 cubic spline", xlab="glucose", ylab="pressure", col="blue") 
+
+# or, to make it a line
+lines(smooth1, col="green", lwd=4)
+
+# fit this "loess" smoothed curve to the scatterplot
+scatter1 <- scatter.smooth(data$pressure ~ data$glucose, 
+                           lpars=list(col="blue", lwd=3, lty=1),
+                           main="loess spline")
+```
+
+The basic summary information provided by calling "smooth1".  
+
+`spar=` is the smoothing parameter and if not specified defaults to `NULL` and instead uses the degrees of freedom to approximate the degree of smoothing. Notice that `spar=0.949`. What happens if you change it to 0 or to 1.5?  
+
+`cv=` allows us to specify ordinary or generalized cross-validation (GCV).  
+
+lambda is the shrinkage parameter. Do you remember using this to determine ridge versus LASSO? (hint: 0 gives ridge regression while 1 gives LASSO).  
+
+"loess" (locally weighted scatterplot smoothing) is a basic non-parametric strategy for fitting a smoothed curve to a scatterplot. Check out William G. Jacoby's fun paper to learn more. [Jacoby WG. 2000. Loess: A nonparametric, graphical tool for depicting relationships between variables](https://pdfs.semanticscholar.org/faee/fff54358e3725af0c30c628a0c38ff1b4aea.pdf)
+
+## Generalized additive models (GAMS)
+So far, we have only looked at estimating an outcome variable using a single predictor. However, when considering multilple predictor variables, an extension of multiple linear regression should be used - generalized additive models. 
+
+Thus, GAMS provide smoothed, nonlinear relationships between each predictor and the outcome variable. Each relationship is computed and then summed. 
+
+First, let's recombine our outcome and predictor variables back into the same data frame called `df`:
+```{r}
+df <- cbind(Y, X)
+str(df)
+```
+
+Now, `s` should precede each of our predictor variables to ensure that the model is being properly constructed using spline-based smoothing. 
+
+The `fx` logical parameter can be added inside each `s` predictor variable to specify a fixed (`TRUE`) or penalized regression spline (`FALSE`). `bs` can also be added to specify the type of smoothing (eg., `tp` for thin plate, `cr` for cubic, etc.). A variety of other parameters can be specified.  
+
+Fit the GAM: 
+```{r}
+gam1 <- gam(Y ~ s(pregnant) + s(glucose) + s(triceps) + s(insulin) + s(mass) + s(age), 
+            family="gaussian",
+            data=df)
+
+# plot weighted partial residuals (dropping the specified term while including all others)
+plot(gam1, pages=1, residuals=TRUE)
+
+# plot seWithMean will show component smooths with confidence intervals that include overall mean uncertainty
+plot(gam1, pages=1, seWithMean=TRUE) # is this is the same thing as "residuals=FALSE"?
+
+# or, to view them one at a time:
+plot(gam1, seWithMean=TRUE)
+
+# view summary output
+gam.check(gam1)
+```
+
+**explain plot outputs here**
+
+In `gam.check` summary output:
+`k'` is ...
+
+`edf` is ...
+
+`k-index` is ...
+
+`p-value` is ...
+
+## 3D GAM plots
+The "plotmo" R package offers a great way to visualize regression splines in three dimensions:
+```{r}
+plotmo(gam1, all2=TRUE) # show simplfied seWithMean plots AND three dimensional splines for all variable relationships
+
+plotmo(gam1, all2=TRUE, pmethod = "partdep") # plot partial dependencies (takes a few minutes)
+
+plotmo(gam1, all2=TRUE, pmethod = "apartdep", # faster version of pmethod="partdep"
+       caption = "What have I gotten myself in to...") 
+
+# let's play around with a few more parameters! 
+plotmo(gam1, all2=TRUE, pt.col = "green3")
+plotmo(gam1, all2=TRUE, pt.col = "green3", smooth.col = "red")
+plotmo(gam1, all2=TRUE,  
+       pt.col = "green3", 
+       smooth.col = "red",
+       grid.col="gray80")
+
+# return just some of the plots! 
+plotmo(gam1, all2=TRUE, degree1 = c(1,2), degree2=0) # show just the first two predictor plots
+
+plotmo(gam1, all2=TRUE, degree1 = 0, degree2 = 1, # return just glucose v. pregnant perspective plot
+       caption = "this is called a 'perspective plot'")
+
+# return a contour plot
+plotmo(gam1, all2=TRUE, degree1 = 0, degree2 = 1, type2 = "contour", 
+       contour.col="royalblue",
+       contour.labcex=1,
+       main="this is called a 'contour plot'")
+
+# return a color image 
+plotmo(gam1, all2=TRUE, degree1 = 0, degree2 = 1, type2 = "image", 
+       image.col=heat.colors(12),
+       main="this is a color image", 
+       caption="this is getting pretty crazy!")
+       
+# etc... 
+```
+
+See [Wood S. 2006. Generalized additive models: An introduction with R](https://www.amazon.com/Generalized-Additive-Models-Introduction-Statistical/dp/1584884746) for expert explanations.  
+
+Also check out [Stephen Millborrow's excellent instructions on the "plotmo" R package](http://www.milbo.org/doc/plotmo-notes.pdf)
+
+## Multivariate adaptive regression splines (MARS)
+Multivariate adaptive regression splines (MARS) are a technique developed by Jerome H. Friedman in 1991 and copyrighted by Salford Systems. Open source implementations are thusly referred to as "Earth", hence the name of the "earth" R package we are using today. 
+
+MARS approaches use "surrogate features" (or, models of the models), usually versions of one or two predictors at a time. Each predictor is divided into two groups and each group models the outcome variable for each group. This creates a "piecewise linear model" where each new feature is some proportion of the data. 
+
+Group definitions are provided via linear regression models! Those with the smallest error are used. See [Kuhn and Johnson, 2016:145 ](http://appliedpredictivemodeling.com/) for more information. 
+
+```{r}
+# recombine our Y outcome ("diabetes") and X predictors into a single data frame
+mars_df <- cbind(Y, X)
+
+# fit the model
+mars1 <- earth(Y ~ ., data=mars_df, pmethod="backward", nprune=20, nfold=10)
+
+# view summary output
+summary(mars1)
+
+# view predictor importance
+evimp(mars1)
+
+# compute predicted values
+mars_pred <- predict(mars1)
+
+# print accuracy
+(mse <- mean((mars_df$Y - mars_pred)^2))
+
+# plot
+pdf("mars1 plot.pdf")
+plot(mars1)
+dev.off()
+
+# also
+pdf("mars2 plotmo.pdf")
+plotmo(mars1)
+dev.off()
+
+# 3d MARS plots!
+plotmo(mars1)
+
+# same syntactical rules apply here as well
+plotmo(mars1, all2=TRUE)
+
+plotmo(mars1, all2=TRUE, degree1=0, degree2=9,
+       caption = "what is the influence of 'miss_insulin'?") 
+```
+
+**explain plot outputs here**
+
+In `summary(mars1)`:  
+
+The coefficients are ...  
+
+What terms and predictors were selected?  
+
+What is a termination condition?  
+
+`GVC` ...
+
+`RSS` ...
+
+`GRSq` ...
+
+`RSq` ...
+
+`CVRSq` ...
+
+CV sd's are sd's across folds?  
+
+In `evimp(mars1)`:
+
+`nsubsets` ...
+
+`gvc` ...
+
+`rss` ...
+
+
+## Acknowledgements
+I express sincere gratitude to the authors of cited work in this file, in addition to: 
+["earth" R package](https://cran.r-project.org/web/packages/earth/earth.pdf)
+["mgcv" R package](https://cran.r-project.org/web/packages/mgcv/mgcv.pdf)
+["plotmo" R package](https://cran.r-project.org/web/packages/plotmo/plotmo.pdf)
+
+
