@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 We will use the following packages for this example:
 ```{r}
 if (F) {
-  install.packages(c("devtools", "eartj", "ggplot2", "mgcv", "mlbench", "plotmo"))
+  install.packages(c("devtools", "earth", "ggplot2", "mgcv", "mlbench", "plotmo"))
   devtools::install_github("ck37/ck37r")
 }
 
