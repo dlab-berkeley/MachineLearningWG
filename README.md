@@ -16,7 +16,12 @@ Spring 2017 Schedule
 [click for an overview of regerssion analysis in Python](http://www.turingfinance.com/regression-analysis-using-python-statsmodels-and-quandl/)  
 [click for an overview of generalized linear models in Python](http://scikit-learn.org/stable/modules/linear_model.html)  
 
-* March 3 - Linear regression, polynomial regression, polynomial splines, smoothing splines
+* March 3 - Linear regression, polynomial regression, polynomial splines, smoothing splines  
+[see Chapters 3 and 7 from an Introduction to Statistical Learning for overviews of regression and splines](http://www-bcf.usc.edu/~gareth/ISL/ISLR%20Sixth%20Printing.pdf)  
+
+[click here for a linear regression example in Python](http://scikit-learn.org/stable/auto_examples/linear_model/plot_ols.html)  
+
+[click here for a spline walkthrough in Python](https://docs.scipy.org/doc/scipy/reference/tutorial/interpolate.html)  
 
 * March 17 - Multivariate adaptive regression splines, generalized additive models  
 
