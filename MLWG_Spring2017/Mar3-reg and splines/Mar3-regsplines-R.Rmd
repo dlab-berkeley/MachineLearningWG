@@ -202,7 +202,7 @@ summary(poly_macro)
 
 unem_lims <- range(macro$unem)
 unem_grid <- seq(from=unem_lims[1], to=unem_lims[2])
-poly_preds <- predict(poly_lm, newdata=list(unem=unem_grid), se=TRUE)
+poly_preds <- predict(poly_macro, newdata=list(unem=unem_grid), se=TRUE)
 
 lines(unem_grid, poly_preds$fit, lty=2, lwd=2, col="red")
 legend("topleft", inset=.0, c("linear", "ploy 4"), lty=c(1,2), lwd=2, col=c("black", "red"), cex=.75)
