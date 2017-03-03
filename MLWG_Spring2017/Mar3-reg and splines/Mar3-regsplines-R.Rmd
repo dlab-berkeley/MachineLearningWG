@@ -122,7 +122,7 @@ toy_df
 poly2 <- lm(Y ~ poly(X, 3, raw=TRUE))
 poly2
 summary(poly2)
-lines(X ~ fitted(lm_poly2), lty=2, lwd=2, col="red")
+lines(X ~ fitted(poly2), lty=2, lwd=2, col="red")
 legend("topleft", inset=.0, c("linear", "poly 3"), lty=c(1,2), lwd=2, col=c("black","red"), cex=.75)
 
 ## sanity check
@@ -165,7 +165,7 @@ legend("topleft", inset=.0, c("linear", "poly 3", "poly spline", "smooth1"), lty
 
 ##7. Repeat with the "macro" data from the "Zelig" package
 ```{r}
-data(macro)
+data(macro, package = "Zelig")
 macro_lm <- lm(gdp ~ unem, data=macro)
 macro_lm
 summary(macro_lm)
@@ -190,7 +190,7 @@ macro_pred <- predict(macro_lm, macro)
 macro_pred <- macro_lm$coefficients[1] + macro_lm$coefficients[2] * macro$unem
 
 ## check MSE on the predicted values
-MSE <- mean(macro$gdp - macro_pred)^2
+MSE <- mean((macro$gdp - macro_pred)^2)
 MSE
 ```
 
