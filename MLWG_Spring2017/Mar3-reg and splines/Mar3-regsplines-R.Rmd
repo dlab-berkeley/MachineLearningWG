@@ -56,7 +56,7 @@ abline(B0, B1, col="black", lwd=2)
 legend("topleft", inset=.0, c("linear"), lty=1, lwd=2, col="black", cex=.75)
 
 ## generate predicted values by plugging in our X values to the equation: 
-Y_hat <- 0.4 + 0.8 * X
+Y_hat <- B0 + B1 * X
 Y_hat
 
 ## calculate root mean sqaure error (RMSE) for our predictions. First, calculatte the error for each observation by subracting it from the predicted value:
@@ -68,15 +68,15 @@ Y_err_sq <- Y_err^2
 Y_err_sq
 
 ## sum these values
-RMSE <- sum(Y_err_sq)
-RMSE
+sum_squared_err <- sum(Y_err_sq)
+sum_squared_err
 
 ## divide by n and take square root to produce the RMSE:
-RMSE <- sqrt(sum(Y_err_sq) / length(Y))
+RMSE <- sqrt(sum_squared_err / length(Y))
 RMSE
 
 ## sanity check
-RMSE == sqrt(sum((Y_hat-Y)^2) / length(Y))
+RMSE == sqrt(sum((Y_hat - Y)^2) / length(Y))
 
 ## double sanity check
 ## fit the model using the lm function in R:
