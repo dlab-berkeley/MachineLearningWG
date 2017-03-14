@@ -1,5 +1,5 @@
 ---
-title: "regression and splines" 
+title: "regression and splines (working version)" 
 author: "Evan Muzzall"
 date: "3/3/2017"
 output: html_document
@@ -118,7 +118,7 @@ X3 <- X^3
 toy_df <- data.frame(Y, X, X2, X3)
 toy_df
 
-## the "poly" function produces the same results
+## the "poly" function produces the same results (when raw=TRUE)
 poly2 <- lm(Y ~ poly(X, 3, raw=TRUE))
 poly2
 summary(poly2)
@@ -132,14 +132,14 @@ poly1$coefficients == poly2$coefficients
 ##5. Polynomial splines
 Polynomial splines are [piecewise polynomial functions](https://www.khanacademy.org/math/algebra/algebra-functions/piecewise-functions/v/piecewise-function-example) that form smoothed curved shapes at their junctions (called "knots"). The X predictor is divided into K regions, and a polynomial function is fit to the data within each region. This allows for greater flexibility than linear or polynomial fits. This is a k^th^ order spline where coefficients can be estimated by least squares. Derivatives are fit between each knot, and each imposed constraint releases a degree of freedom, thus smoothing the polynomial fits.  As such, polynomial splines are generally more flexible fits than polynomial regression models.
 
-"poly spline" (basis-spline) is the function that allows for continuous joins at the spline knots. It is the marix that contains the information of the piecewise polynomial functions used to fit the spline.  
+"poly spline" (basis-spline) is the function that allows for continuous joins at the spline knots. It is the matrix that contains the information of the piecewise polynomial functions used to fit the spline.  
 ```{r}
 ## create xy data frame using our X and Y variables
 xy <- data.frame(X, Y)
 xy
 
 bs(xy$X, df=3)
-summary(ps1 <- lm(Y ~ bs(X, df=3), data = xy))
+summary(ps1 <- lm(Y ~ bs(X, df=3, knots=8), data = xy))
 
 ## example of "safe" prediction (see Chambers JM, Hastie TJ (editors). 1992. Statistical Models in S. Pacific Grove, CA:  Wadsworth and Brooks/Cole. p 288-289 for "smart" versus "safe" prediction)
 summary(xy$X)
@@ -148,10 +148,13 @@ lines(X_pred, predict(ps1, data.frame(X=X_pred)), lty=3, lwd=2, col="green")
 legend("topleft", inset=.0, c("linear", "poly 3", "poly spline"), lty=c(1,2,3), lwd=2, col=c("black","red", "green"), cex=.75)
 ```
 
+Consider using "SuperLearner" to find optimal number of knots!  
+
 ##6. Smoothing splines
 Smoothing splines are similar to the poly splines above, except they produce knots at each data point and coefficients of the estimated function are shrunk via regularization, thus helping prevent overfitting.  
 
-The goal is to minimize loss+penalty in addition to a small residual sum of squares - this forms the smoothing spline. However, by treating each X observation as a data point we might be concerned with getting an overfit model. Thus it is useful to talk about degrees of freedom in terms of their _effective degrees of freedom_, or a general representation of the flexibility of the smoothing spline of shrunken degrees of freedom: 
+The goal is to minimize loss+penalty in addition to a small residual sum of squares - this forms the smoothing spline. However, by treating each X observation as a data point we might be concerned with getting an overfit model. Thus it is useful to talk about degrees of freedom in terms of their _effective degrees of freedom_, or a general representation of the flexibility of the smoothing spline of shrunken degrees of freedom.  
+Also, intervals are allowed to overlap. 
 ```{r}
 smooth1 <- smooth.spline(y=Y, x=X, cv=FALSE, keep.data=TRUE, spar=NULL, penalty=1)
 smooth1
