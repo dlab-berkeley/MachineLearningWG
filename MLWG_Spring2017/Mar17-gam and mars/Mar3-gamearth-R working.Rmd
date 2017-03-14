@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-##1. Package installation 
+##1. Package installation  
 We will use the following packages for this example:
 ```{r}
 if (F) {
