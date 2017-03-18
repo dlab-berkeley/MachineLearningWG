@@ -133,7 +133,7 @@ plot(gam3, pages=1)
 
 anova(gam1, gam2, gam3, test="F") # small p-value suggests that a non-linear function for glucose is preferable?
 
-AIC(gam1, gam2, gam3)
+AIC(gam1, gam2, gam3) # is this a multiple comparison problem? 
 BIC(gam1, gam2, gam3)
 ```
 
@@ -159,6 +159,8 @@ AIC(gam1, gam2, gam3, gam4)
 The "plotmo" R package offers a great way to visualize regression splines in three dimensions:
 ```{r}
 plotmo(gam1, all2=TRUE) # show simplfied seWithMean plots AND three dimensional splines for all variable relationships
+
+# non-additive shapes have correlated effects in 3D plane surfaces.
 
 # plot partial dependencies (takes a few minutes)
 # plotmo(gam1, all2=TRUE, pmethod = "partdep") 
@@ -203,8 +205,9 @@ Group definitions are provided via linear regression models! Those with the smal
 Fit the earth model
 ```{r}
 # fit the model
+set.seed(1)
 earth1 <- earth(pressure ~ ., data=data, 
-                degree=2, nk=min(200, max(20, 2 * ncol(train))) + 1, 
+                degree=1, nk=5, 
                 keepxy=TRUE, nprune=20, nfold=10, ncross=2,
                 pmethod="cv", trace=4) 
 
@@ -224,24 +227,17 @@ earth_pred <- predict(earth1)
 Earth plots
 ```{r}
 # plot
+png("earth1.png")
 plot(earth1)
+dev.off()
 plot(earth1, info=T, type="response", trace=1)
 plotmo(earth1, info=T, type="response", trace=1)#, level=.9)
-
-library(car)
-cr.plots(earth1)
-#crPlot(earth1)
-#avPlots(earth1, train$insulin)
 
 # 3d MARS plots!
 # same syntactical rules apply here as well
 plotmo(earth1)
 
 plotmo(earth1, all2=TRUE, persp.col="azure")
-
-plotmo(earth1, all2=TRUE, degree1=0, degree2=9,
-       caption = "earth persp plot", 
-       persp.col="seashell1") 
 ```
 
 We can also see the ideal number of terms
@@ -251,7 +247,7 @@ control <- trainControl(method = "repeatedcv",
 
 grid <- expand.grid(.degree = 1, .nprune = 2:25)
 
-earth_best_terms <- train(pressure ~ ., data = train, method = "earth",
+earth_best_terms <- train(pressure ~ ., data = data, method = "earth",
 tuneGrid= grid)
 
 earth_best_terms
