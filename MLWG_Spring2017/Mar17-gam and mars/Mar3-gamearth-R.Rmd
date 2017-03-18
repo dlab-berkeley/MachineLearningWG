@@ -1,7 +1,7 @@
 ---
 title: "Generalized additive models (GAMs) and Multivariate adaptive regression splines (MARS/EARTH) - rough draft"
 author: "Evan Muzzall"
-date: "3/13/2017"
+date: "3/17/2017"
 output: html_document
 ---
 
@@ -80,7 +80,7 @@ When considering multilple predictor variables, another extension of multiple li
 
 Generalized additive models (GAMs) are another extension of multiple linear regression. They are not bound by linear relationships between predictor and response variable and can instead incorporate smoothed, nonlinear relationships. Each relationships is computed and summed (thus making it "additive"). Smoothed splines are not the only constructs used to build GAMs, as they can be built using natural splines, local regression, polynomial regression, etc.  
 
-However, for a smoothed spline GAM, least squares cannot be used to estimate the coefficients. This is instead handled by "backfitting", or updating the model as each predictor is approximated using penalized likelihood maximization.  
+"Backfitting", or updating the model as each predictor is approximated using penalized likelihood maximization,  comprises the smoothed spline. 
 
 See [Wood's book](https://www.crcpress.com/Generalized-Additive-Models-An-Introduction-with-R/Wood/p/book/9781584884743) for thorough walkthroughs of GAMs in R. 
 
