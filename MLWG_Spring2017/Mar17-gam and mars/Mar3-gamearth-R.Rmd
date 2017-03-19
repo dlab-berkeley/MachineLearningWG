@@ -227,9 +227,9 @@ earth_pred <- predict(earth1)
 Earth plots
 ```{r}
 # plot
-png("earth1.png")
+# png("earth1.png")
 plot(earth1)
-dev.off()
+# dev.off()
 plot(earth1, info=T, type="response", trace=1)
 plotmo(earth1, info=T, type="response", trace=1)#, level=.9)
 
