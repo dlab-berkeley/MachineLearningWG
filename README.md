@@ -39,10 +39,10 @@ More information on the [D-Lab MLWG website](http://dlab.berkeley.edu/working-gr
 
 Books:
 
-* Intro to Statistical Learning [(free pdf)](http://www-bcf.usc.edu/~gareth/ISL/ISLR%20First%20Printing.pdf) [(Amazon page)](https://smile.amazon.com/Introduction-Statistical-Learning-Applications-Statistics-ebook/dp/B01IBM7790/) by Gareth James et al.
-* [Applied Predictive Modeling](https://smile.amazon.com/Applied-Predictive-Modeling-Max-Kuhn-ebook/dp/B00K15TZU0/) by Max Kuhn
-* Elements of Statistical Learning
-* Many others (any recommendations?)
+1. **Intro to Statistical Learning** by James et al. [(free pdf)](http://www-bcf.usc.edu/~gareth/ISL/ISLR%20First%20Printing.pdf) [(Amazon)](https://smile.amazon.com/Introduction-Statistical-Learning-Applications-Statistics-ebook/dp/B01IBM7790/)
+2. **Applied Predictive Modeling** by Max Kuhn [(Amazon)](https://smile.amazon.com/Applied-Predictive-Modeling-Max-Kuhn-ebook/dp/B00K15TZU0/)
+3. **Elements of Statistical Learning** by Hastie et al.  [(free pdf)](http://statweb.stanford.edu/~tibs/ElemStatLearn/download.html) [(Amazon)](https://smile.amazon.com/Elements-Statistical-Learning-Prediction-Statistics-ebook/dp/B00475AS2E/)
+4. **Modern Multivariate Statistical Techniques** by Alan Izenman [(Amazon)](https://smile.amazon.com/Modern-Multivariate-Statistical-Techniques-Classification-ebook/dp/B00HWUR9CS/)
 
 Courses at Berkeley:
 
@@ -57,16 +57,7 @@ Online classes
 
 * [Coursera Data Science Specialization](https://www.coursera.org/specializations/jhu-data-science)
 * [edX - Principles of Machine Learning](https://www.edx.org/course/principles-machine-learning-microsoft-dat203-2x-2)
-
 * [edX - Applied Machine Learning](https://www.edx.org/course/applied-machine-learning-microsoft-dat203-3x-0)
-
-D-Lab Machine Learning Trainings
-
-* D-Lab - Intro to Machine Learning in R
-* Erin LeDell - h2o.ai
-* Rochelle Terman - scikit-learn
-
-[Specifics on the D-Lab calendar](http://dlab.berkeley.edu/calendar-node-field-date)
 
 Other Campus Groups
 
