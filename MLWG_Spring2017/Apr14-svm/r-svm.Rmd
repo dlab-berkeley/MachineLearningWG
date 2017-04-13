@@ -1,0 +1,52 @@
+---
+title: "Support vector machines in R"
+output:
+  html_document: default
+  html_notebook: default
+---
+
+Topics to cover:
+
+* Background
+* Polynomial kernels
+* Radial basis function (RBF) kernel
+* Hyperparameter optimization
+
+Before we dig in, we will install the R packages we'll be using.
+
+**R packages**
+```{r}
+# List of packages we will use.
+packages = c("MASS", "mlbench", "devtools")
+
+# Try to load each package and save the result.
+success = sapply(packages, require, character.only = T, quietly = T)
+
+# Check if any packages still need to be installed.
+if (sum(!success) > 0) {
+  # Install any needed packages.
+  install.packages(packages[!success])
+  
+  # Load the newly installed packages.
+  sapply(packages[!success], require, character.only = T, quietly = T)
+}
+
+github_packages = c(
+    # Chris K.'s tools package, for imputing missing values, etc.
+    "ck37/ck37r",
+    # Use more up-to-date SuperLearner from github.
+    "ecpolley/SuperLearner")
+
+devtools::install_github(github_packages)
+
+# Clean up variables.
+rm(packages, success, github_packages)
+```
+
+# Background
+
+# Polynomial kernels
+
+# Radial basis function kernels
+
+# Hyperparameter optimization
