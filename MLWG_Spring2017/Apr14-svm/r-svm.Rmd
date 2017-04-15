@@ -32,8 +32,10 @@ if (sum(!success) > 0) {
 }
 
 github_packages = c(
-    # Use more up-to-date SuperLearner from github.
-    "ecpolley/SuperLearner")
+  # Chris's tools package for plotting the SuperLearner.
+  "ck37/ck37r",
+  # Use more up-to-date SuperLearner from github.
+  "ecpolley/SuperLearner")
 
 devtools::install_github(github_packages)
 
@@ -43,7 +45,7 @@ rm(packages, success, github_packages)
 
 # Background
 
-Deb has done a great job covering the background & theory for SVM. See also Intro to Statistical Learning Chapter 9, Applied Predictive Modeling sections 7.3, 13.4, 13.7.4, etc.
+Deb has done a great job covering the background & theory for SVM in the python materials. See also Intro to Statistical Learning Chapter 9, Applied Predictive Modeling sections 7.3, 13.4, 13.7.4, or pretty much any other machine learning textbook.
 
 Motivational quote: "SVMs not only have a more solid foundation than artificial neural nets, but are able to serve as a replacement for neural nets." - Learning with Kernels, 2002.
 
@@ -94,15 +96,16 @@ library(kernlab)
 
 # Regression version.
 # X should be a matrix, not a dataframe.
-fit = ksvm(x = X_mat, y = Y_reg, kernel = "polydot")
+fit = ksvm(x = X_mat, y = Y_reg, kernel = "polydot", kpar = list(degree = 3))
 fit
 
 # Compare to using a dataframe rather than a matrix.
+# The error message is particularly unhelpful.
 fit = ksvm(x = X, y = Y_reg, kernel = "polydot")
 
 # Classification version.
 # Y should be a factor so that classification is run automatically.
-fit = ksvm(x = X_mat, y = Y_class, kernel = "polydot")
+fit = ksvm(x = X_mat, y = Y_class, kernel = "polydot",  kpar = list(degree = 3))
 fit
 
 ```
@@ -118,7 +121,7 @@ fit = ksvm(x = X_mat, y = Y_reg, kernel = "rbfdot")
 fit
 
 # Classification
-fit = ksvm(x = X_mat, y = Y_bin, kernel = "rbfdot")
+fit = ksvm(x = X_mat, y = Y_class, kernel = "rbfdot")
 fit
 
 ```
@@ -137,14 +140,22 @@ The scale parameter Gamma ($\gamma$) aka Sigma ($\sigma$) is effectively the inv
 library(SuperLearner)
 
 tuning_list = list(
-  # Try different kernels
+  # Try different kernels.
+  # Unfortunately we cannot currently customize the degree for the polynomial kernel when
+  # using create.Learner() - this will be fixed. We could make the functions manually though.
   kernel = c("polydot", "rbfdot", "laplacedot"),
   # Regularization parameter, could be 2^-5 to 2^15.
   C = 2^c(-4, -2, 0, 2, 4, 6, 8)
 )
 
+# Review the C values we are testing.
+tuning_list$C
+
 svm_learners = create.Learner("SL.ksvm", detailed_names = T,
                               tune = tuning_list)
+
+# Review the learners that were created.
+svm_learners$names
 
 sl_lib = c("SL.mean", "SL.glm", "SL.ksvm", svm_learners$names)
 
@@ -153,9 +164,17 @@ set.seed(1)
 Y_num = as.numeric(Y_class) - 1
 table(Y_num, Y_class)
 
+# Currently displays some extra output unfortunately.
 result = SuperLearner(Y = Y_num, X = Boston[, -14], family = "binomial",
                       SL.library = sl_lib)
 result
+
+# Use plot.SuperLearner() from here.
+library(ck37r)
+
+# Plot the results. Use CV.SuperLearner to also plot the SL performance.
+# We need to pass in the outcome variable for this plot.
+plot(result, Y_num)
 ```
 
 # Other notes
