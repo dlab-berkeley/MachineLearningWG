@@ -27,6 +27,8 @@ Spring 2017 Schedule
 
 * April 14 - Support vector machines  
 
+[click here for an explanation of why and when to use SVMs](http://blog.yhat.com/posts/why-support-vector-machine.html)
+
 * April 28 - Neural networks  
 
 We are always looking for student/staff/faculty presenters. Please contact the D-Lab if you are interested!  
@@ -43,6 +45,7 @@ Books:
 2. **Applied Predictive Modeling** by Max Kuhn [(Amazon)](https://smile.amazon.com/Applied-Predictive-Modeling-Max-Kuhn-ebook/dp/B00K15TZU0/)
 3. **Elements of Statistical Learning** by Hastie et al.  [(free pdf)](http://statweb.stanford.edu/~tibs/ElemStatLearn/download.html) [(Amazon)](https://smile.amazon.com/Elements-Statistical-Learning-Prediction-Statistics-ebook/dp/B00475AS2E/)
 4. **Modern Multivariate Statistical Techniques** by Alan Izenman [(Amazon)](https://smile.amazon.com/Modern-Multivariate-Statistical-Techniques-Classification-ebook/dp/B00HWUR9CS/)
+5. **Differential Equations and Linear Algebra** by Stephen Goode and Scott Annin [(Amazon)](https://www.amazon.com/Differential-Equations-Linear-Algebra-Stephen-ebook/dp/B00HR7MR3W/ref=mt_kindle?_encoding=UTF8&me=)
 
 Courses at Berkeley:
 
@@ -58,6 +61,7 @@ Online classes
 * [Coursera Data Science Specialization](https://www.coursera.org/specializations/jhu-data-science)
 * [edX - Principles of Machine Learning](https://www.edx.org/course/principles-machine-learning-microsoft-dat203-2x-2)
 * [edX - Applied Machine Learning](https://www.edx.org/course/applied-machine-learning-microsoft-dat203-3x-0)
+* [Coursera - Machine Learning](https://www.coursera.org/learn/machine-learning)
 
 Other Campus Groups
 
