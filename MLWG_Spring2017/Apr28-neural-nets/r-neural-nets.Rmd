@@ -18,27 +18,21 @@ Before we dig in, we will install the R packages we'll be using.
 **R packages**
 ```{r}
 # List of packages we will use.
-packages = c("MASS", "nnet", "h2o", "devtools")
-
-# Try to load each package and save the result.
-success = sapply(packages, require, character.only = T, quietly = T)
-
-# Check if any packages still need to be installed.
-if (sum(!success) > 0) {
-  # Install any needed packages.
-  install.packages(packages[!success])
-  
-  # Load the newly installed packages.
-  sapply(packages[!success], require, character.only = T, quietly = T)
-}
+packages = c("MASS", "nnet", "h2o", "devtools", "NeuralNetTools")
 
 github_packages = c(
   # Chris's tools package for plotting the SuperLearner.
-  "ck37/ck37r",
+  "ck37r" = "ck37/ck37r",
   # Use more up-to-date SuperLearner from github.
-  "ecpolley/SuperLearner")
+  "SuperLearner" = "ecpolley/SuperLearner")
 
 devtools::install_github(github_packages)
+
+# Load those github packages.
+ck37r::load_packages(names(github_packages))
+
+# Load required non-github packages and install from CRAN if necessary.
+ck37r::load_packages(packages, install = T)
 
 # Also install mxnet for potential usage.
 # This unfortunately is Mac/Windows only; probably will not work for Linux.
@@ -114,11 +108,17 @@ fit = nnet(Y_class ~ X_mat, size = 2, decay = 5e-4, maxit = 200)
 # Review our neural network fit.
 fit
 
+# Plot our neural network.
+library(NeuralNetTools)
+plotnet(fit)
+
 # Predict back to our original data.
 pred = predict(fit, X_mat)
 
 # Review predictions.
 summary(pred)
+
+# 
 ```
 
 Quick regression example
@@ -139,6 +139,9 @@ fit = nnet(Y_reg ~ X_mat, size = 2, decay = 5e-4, maxit = 200,
 # Review our neural network fit.
 fit
 
+# Visualize neural network.
+plotnet(fit)
+
 # Predict back to our original data.
 pred = predict(fit, X_mat)
 
@@ -150,6 +153,7 @@ mean((pred - Y_reg)^2)
 
 # And root mean squared error (RMSE).
 sqrt(mean((pred - Y_reg)^2))
+
 ```
 
 # SuperLearner optimization
