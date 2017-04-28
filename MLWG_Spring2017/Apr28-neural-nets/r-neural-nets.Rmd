@@ -40,6 +40,16 @@ github_packages = c(
 
 devtools::install_github(github_packages)
 
+# Also install mxnet for potential usage.
+# This unfortunately is Mac/Windows only; probably will not work for Linux.
+# Actually not working for Mac either.
+if (F) {
+  # Skip this for now.
+  install.packages("drat", repos="https://cran.rstudio.com")
+  drat:::addRepo("dmlc")
+  install.packages("mxnet")
+}
+
 # Clean up variables.
 rm(packages, success, github_packages)
 ```
@@ -84,3 +94,72 @@ prop.table(table(Y_class))
 
 ```
 
+# Single-layer neural network
+
+
+Quick classification example
+
+```{r}
+library(nnet)
+
+# Classification
+
+# Set seed because weights are initialized randomly.
+set.seed(1)
+
+# X can be a dataframe or matrix.
+# If Y is a factor we need to use this formula notation.
+fit = nnet(Y_class ~ X_mat, size = 2, decay = 5e-4, maxit = 200)
+
+# Review our neural network fit.
+fit
+
+# Predict back to our original data.
+pred = predict(fit, X_mat)
+
+# Review predictions.
+summary(pred)
+```
+
+Quick regression example
+
+```{r}
+library(nnet)
+
+# Set seed because weights are initialized randomly.
+set.seed(1)
+
+# Again, X can be a dataframe or matrix.
+fit = nnet(Y_reg ~ X_mat, size = 2, decay = 5e-4, maxit = 200,
+           # Enable linear output to support regression.
+           linout = T)
+
+# Challenge: try with linout = F (the default) and see what happens.
+
+# Review our neural network fit.
+fit
+
+# Predict back to our original data.
+pred = predict(fit, X_mat)
+
+# Review predictions.
+summary(pred)
+
+# Calculate mean-squared error (MSE).
+mean((pred - Y_reg)^2)
+
+# And root mean squared error (RMSE).
+sqrt(mean((pred - Y_reg)^2))
+```
+
+# SuperLearner optimization
+
+These challenges can be done in pairs/groups to make it easier.
+
+Challenge 1: use SL.nnet wrapper to estimate performance of the neural network.
+
+Challenge 2: use create.Learner() to test 2, 3, 4, or 5 hidden units and create a weighted average ensemble.
+
+# Multi-layer neural network
+
+Challenge: use h2o to design this.
