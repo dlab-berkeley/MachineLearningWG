@@ -56,11 +56,11 @@ rm(packages, success, github_packages)
 
 # Background
 
-
+Please see Deb's python code for more details on neural network theory.
 
 # Software packages
 
-
+We'll be using `nnet` for simple neural networks and `h2o` for deep neural networks.
 
 # Data preparation
 
@@ -163,3 +163,27 @@ Challenge 2: use create.Learner() to test 2, 3, 4, or 5 hidden units and create 
 # Multi-layer neural network
 
 Challenge: use h2o to design this.
+
+```{r}
+library(h2o)
+# Startup and connect to our existing h2o cluster.
+# Use all available threads.
+h2o.init(nthreads = -1)
+
+# Clean slate - just in case the cluster was already running.
+h2o.removeAll()
+
+# Load x data into h2o.
+data = as.h2o(cbind(X_df, `_outcome` = Y_reg))
+dim(data)
+
+outcome = "_outcome"
+x = colnames(X_df)
+
+# Fit the deep learning model here.
+
+# Shutdown server when we're done.
+h2o.shutdown(prompt = F)
+```
+
+See also Erin LeDell's [excellent tutorial on deep learning](https://github.com/ledell/useR-machine-learning-tutorial/blob/master/deep-neural-networks.Rmd).
