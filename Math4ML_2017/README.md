@@ -15,3 +15,5 @@ This is the summer 2017 reading group for the D-Lab Machine Learning Working Gro
 [MIT 18.657 Mathematics of Machine Learning - course syllabus and resources](https://ocw.mit.edu/courses/mathematics/18-657-mathematics-of-machine-learning-fall-2015/syllabus/)  
 
 [Rahm E, Do HH. 2000. Data cleaning: Problems and current approaches. IEEE Data Eng. Bull. 23.4:3-13](https://dbs.uni-leipzig.de/en/publication/title/data_cleaning_problems_and_current_approaches)  
+
+[Valiant LG. 1984. A theory of the learnable. Communications of the ACM 27:1134-1142](https://people.mpi-inf.mpg.de/~mehlhorn/SeminarEvolvability/ValiantLearnable.pdf)
