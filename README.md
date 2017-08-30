@@ -1,39 +1,31 @@
 # Machine Learning Working Group  
 
-Fridays: February 3, February 17, March 3, March 17, April 14, April 28, (one more special topic meeting, TBD?)  
+Alternating Fridays 9/8 to 12/15 from 12:30-2:00pm in the D-Lab Convening Room (356 Barrows). 
 
-12:30-2pm in 356 Barrows Hall  
+- September 8: BRC Savio lightening talk, introduction, resources, dataset; feed forward and deep feed forward neural networks
 
-Spring 2017 Schedule  
+-- See [R examples here]()
 
-* February 3 - Introductory meeting and k-nearest neighbor classification and regression  
-[click for KNN example in R](https://www.datacamp.com/community/tutorials/machine-learning-in-r#gs.GpuyCu0)  
-[click for KNN example in Python](http://scikit-learn.org/stable/modules/neighbors.html)
+-- See [Python examples here]()
 
-* February 17 - Stepwise regression  
-[see Chapter 6 from An Introduction to Statistical Learning for an overview of stepwise regression](http://www-bcf.usc.edu/~gareth/ISL/ISLR%20Sixth%20Printing.pdf)  
+- September 22: Benten lightening talk(?); convolutional neural networks
 
-[click for an overview of regerssion analysis in Python](http://www.turingfinance.com/regression-analysis-using-python-statsmodels-and-quandl/)  
-[click for an overview of generalized linear models in Python](http://scikit-learn.org/stable/modules/linear_model.html)  
+-- See [R examples here]()
 
-* March 3 - Linear regression, polynomial regression, polynomial splines, smoothing splines  
-[see Chapters 3 and 7 from an Introduction to Statistical Learning for overviews of regression and splines](http://www-bcf.usc.edu/~gareth/ISL/ISLR%20Sixth%20Printing.pdf)  
+-- See [Python examples here]()
 
-[click here for a linear regression example in Python](http://scikit-learn.org/stable/auto_examples/linear_model/plot_ols.html)  
-
-[click here for a spline walkthrough in Python](https://docs.scipy.org/doc/scipy/reference/tutorial/interpolate.html)  
-
-* March 17 - Multivariate adaptive regression splines, generalized additive models  
-
-* April 14 - Support vector machines  
-
-[click here for an explanation of why and when to use SVMs](http://blog.yhat.com/posts/why-support-vector-machine.html)
-
-* April 28 - Neural networks  
+October 6: 
+October 20: 
+November 3: 
+November 17: 
+December 1: 
+December 15: 
 
 We are always looking for student/staff/faculty presenters. Please contact the D-Lab if you are interested!  
 
-[The Fall 2016 folder](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/MLWG_Fall2016) covers: decision trees, random forests, penalized regression, and boosting
+[The Spring 2017 folder](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/MLWG_Spring2017) covers: k-nearest neighbor classification and regression, stepwise regression, linear and polynomial regression and polynomial and smoothing splines, multivariate adaptive regression splines and generalized additive models, support vector machines, and introductions to neural networks.
+
+[The Fall 2016 folder](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/MLWG_Fall2016) covers: decision trees, random forests, penalized regression, and boosting.
 
 More information on the [D-Lab MLWG website](http://dlab.berkeley.edu/working-groups/machine-learning-working-group)
 
