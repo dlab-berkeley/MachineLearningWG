@@ -28,12 +28,12 @@ Alternating Fridays 9/8 to 12/15 from 12:30-2:00pm in the D-Lab Convening Room (
 
   - See [Python examples here]()
 
-October 6: 
-October 20: 
-November 3: 
-November 17: 
-December 1: 
-December 15: 
+October 6:  
+October 20:  
+November 3:  
+November 17:  
+December 1:  
+December 15:  
 
 We are always looking for student/staff/faculty presenters. Please contact the D-Lab if you are interested!  
 
