@@ -6,7 +6,7 @@ This semester's topic is neural networks for image processing!
 
 [Check out the Neural Network Zoo, by Fjodor Van Veen](http://www.asimovinstitute.org/neural-network-zoo/)
 
-[View this post for classic StackExchange humor: "What does the hidden layer in a  neural network compute?"](https://stats.stackexchange.com/questions/63152/what-does-the-hidden-layer-in-a-neural-network-compute)
+[View this post for a classic StackExchange response to the question "What does the hidden layer in a  neural network compute?"](https://stats.stackexchange.com/questions/63152/what-does-the-hidden-layer-in-a-neural-network-compute)
 
 [Practice with quick tutorials thanks to fast.ai here ](http://course.fast.ai/) and [here](https://github.com/fastai/courses/tree/master/deeplearning1/nbs)
 
