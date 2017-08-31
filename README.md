@@ -37,7 +37,7 @@ November 17:
 December 1:  
 December 15:  
 
-We are always looking for student/staff/faculty presenters. Please contact the D-Lab if you are interested!  
+We are always looking for student/staff/faculty presenters. Please contact us if you are interested!  
 
 [The Spring 2017 folder](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/MLWG_Spring2017) covers: k-nearest neighbor classification and regression, stepwise regression, linear and polynomial regression and polynomial and smoothing splines, multivariate adaptive regression splines and generalized additive models, support vector machines, and introductions to neural networks.
 
