@@ -1,18 +1,32 @@
-# Machine Learning Working Group  
+# Machine Learning Working Group Fall 2017
 
-Alternating Fridays 9/8 to 12/15 from 12:30-2:00pm in the D-Lab Convening Room (356 Barrows). 
+This semester's topic is neural networks for image processing! 
+
+[Click to find out where neural networks might fit in the data science universe, by Swami Chandrasekaran](http://nirvacana.com/thoughts/becoming-a-data-scientist/)  
+
+[Check out the Neural Network Zoo, by Fjodor Van Veen](http://www.asimovinstitute.org/neural-network-zoo/)
+
+[View this post for classic StackExchange humor: "What does the hidden layer ina  neural network compute?"](https://stats.stackexchange.com/questions/63152/what-does-the-hidden-layer-in-a-neural-network-compute)
+
+[Practice with quick tutorials thanks to fast.ai here ](http://course.fast.ai/) and [here](https://github.com/fastai/courses/tree/master/deeplearning1/nbs)
+
+### Dataset
+We will be using [The Nature Convervancy Fisheries Monitoring dataset](https://www.kaggle.com/c/the-nature-conservancy-fisheries-monitoring) for the walkthroughs this semester. 
+
+### Schedule
+Alternating Fridays 9/8 to 12/15 from 12:30-2:00pm in the D-Lab Convening Room (356B Barrows). 
 
 - September 8: BRC Savio lightening talk, introduction, resources, dataset; feed forward and deep feed forward neural networks
 
--- See [R examples here]()
+  - See [R examples here]()
 
--- See [Python examples here]()
+  - See [Python examples here]()
 
 - September 22: Benten lightening talk(?); convolutional neural networks
 
--- See [R examples here]()
+  - See [R examples here]()
 
--- See [Python examples here]()
+  - See [Python examples here]()
 
 October 6: 
 October 20: 
