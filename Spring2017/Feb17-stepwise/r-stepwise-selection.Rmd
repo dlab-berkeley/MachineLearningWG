@@ -1,0 +1,172 @@
+---
+title: ''
+output:
+  html_document: default
+  html_notebook: default
+---
+
+# Stepwise selection
+
+Topics to cover:
+
+* Best subset selection
+* Forward selection
+* Backward selection
+* Cross-validation
+
+Before we dig in, we will install the R packages we'll be using.
+
+**R packages**
+```{r}
+# List of packages we will use.
+packages = c("MASS", "mlbench", "SuperLearner", "devtools")
+
+# Try to load each package and save the result.
+success = sapply(packages, require, character.only = T, quietly = T)
+
+# Check if any packages still need to be installed.
+if (sum(!success) > 0) {
+  # Install any needed packages.
+  install.packages(packages[!success])
+  
+  # Load the newly installed packages.
+  sapply(packages[!success], require, character.only = T, quietly = T)
+}
+
+# Install Chris K.'s tools package, which we'll use for imputing missing values.
+devtools::install_github("ck37/ck37r")
+
+# Clean up variables.
+rm(packages, success)
+```
+
+## Background
+
+Stepwise selection, or [stepwise regression](https://en.wikipedia.org/wiki/Stepwise_regression), is a commonly used technique to include a subset of covariates in a regression model. The goal is to increase accuracy compared to including all covariates in the model, because we can often improve model performance by removing some covariates (as we did with lasso / elastic net). Stepwise is a simple form of **feature selection** - choosing a subset of variables for incorporation into a machine learning algorithm.
+
+### Best subset selection
+
+Ideally we would test every possible combination of covariates and use the combination with the best performance. This is **best subset selection**.
+
+Consider the case of three covariates: X1, X2, and X3. We would estimate the accuracy of the following models:
+
+* All variables: X1, X2, X3 - our default regression
+* X1 and X2 (exclude X3)
+* X2 and X3 (exclude X1)
+* X1 and X3 (exclude X2)
+* X1-only
+* X2-only
+* X3-only
+* No variables (intercept only)
+
+The one with the best performance (e.g. cross-validated mean-squared error) is the one we would use. Stepwise algorithms are commonly used without cross-validation, and as a result they are usually overfitting the data - capturing random error in addition to true relationships in the data, resulting in worse performance on new data.
+
+To generalize to any model size, if we have p covariates we would have to check $2^p$ different combinations: each covariate is either included or not (2 possibilities), so combining that for all covariates we have the product of p twos: $2 * 2 * 2...$ which simplifies to $2^p$. With 10 covariates that is 1,024 models to check, with 20 covariates it's a million, etc.
+
+### Stepwise selection
+
+Stepwise selection is a simplification of best subset selection to make it computationally feasible for any number of covariates. It comes in three forms: forward, backward, and combined forward & backward. Confusingly, sometimes "stepwise" is meant to refer specifically to the "both" approach.
+
+**Forward selection** starts with just the intercept and considers which single variable to incorporate next. It loops over every variable, runs a regression with that variable plus the intercept, and chooses the variable with the best performance on a certain metric: adjusted $R^2$, [f-statistic](https://en.wikipedia.org/wiki/F-test#Regression_problems), [Aikake Information Criterion](https://en.wikipedia.org/wiki/Akaike_information_criterion), or other preferred performance estimate. It then adds that variable to the model and considers the next variable to add, continuing to repeat until no remaining variable improves performance.
+
+## Clean dataset
+
+Let's try out some code. First we prep a demo dataset.
+```{r}
+# Load a test dataset.
+data(PimaIndiansDiabetes2, package = "mlbench")
+
+data = PimaIndiansDiabetes2
+
+# Review data structure.
+str(data)
+
+# Do we have missing values? Yes.
+sum(is.na(data))
+
+library(ck37r)
+
+outcome = "diabetes"
+
+# Impute missing data and add missingness indicators.
+# Don't impute the outcome though.
+result = ck37r::impute_missing_values(data, skip_vars = outcome)
+# Use the imputed dataframe.
+data = result$data
+
+str(data)
+
+# Now do we have missing values?
+sum(is.na(data))
+
+# Create a vector just for the outcome variable.
+# Convert to numeric for glm().
+Y = as.numeric(data[, outcome] == "pos")
+
+# Confirm our outcome vector is correct.
+table(data[, outcome], Y)
+
+# Remove the outcome variable from our covariate list.
+X = data[, !names(data) == outcome]
+
+# Confirm our covariates and dimensions are right.
+colnames(X)
+dim(X)
+length(Y)
+```
+
+## Stepwise selection code
+
+Now let's look at stepwise selection.
+
+```{r}
+# Fit the intercept-only model. Specify data because we will use later.
+initial_reg = glm(Y ~ 1, data = X, family = "binomial")
+summary(initial_reg)
+
+# Define the largest possible model specification.
+largest_model = glm(Y ~ ., data = X, family = "binomial")
+summary(largest_model)
+
+# Review step()
+?step
+
+# Run stepwise forward selection.
+step_reg = step(initial_reg, formula(largest_model),
+                direction = "forward", trace = 0)
+step_reg
+```
+
+**Backward selection** does the same thing but it starts with all variables in the model and considers which variable to first remove from the model. It checks the performance for each variable when it is removed and removes the variable that is least useful to the regression performance. It continues this until no variable yields an increase in performance upon removal.
+
+**Challenges**
+
+1. How similar are stepwise results compared to the significant covariates from the standard OLS we ran first? Hint: compare `step_reg` with `summary(largest_model)`.
+2. Try running with `trace = 1` to see more details in the stepwise process.
+3. Try running with `direction = "backward"` and then `direction = "both"` - do you get the same variables selected? Hint: with backward you will need to change the first argument to use the full model rather than the intercept-only model.
+
+## Cross-validated comparison
+
+As mentioned earlier, it is critical that we use cross-validation to estimate the accuracy of the stepwise procedure. If we don't we will definitely get an overly optimistic estimate of model performance.
+
+```{r}
+
+sl_lib = c("SL.mean", "SL.glm", "SL.glmnet", "SL.step.forward", "SL.stepAIC")
+
+set.seed(1)
+sl = SuperLearner(Y, X, family = binomial(), SL.library = sl_lib)
+sl
+```
+
+**Challenges**
+
+1. Add in one or two other algorithms we've used. How do they compare to stepwise?
+2. Look at the code for `SL.step.forward` and `SL.stepAIC` - any questions on how they work?
+
+## Further reading
+
+* Intro to Statistical Learning, section 6.1.2
+* Applied Predictive Modeling, chapter 19 "Feature Selection".
+* ["What are some of the problems with stepwise regression?"](http://www.stata.com/support/faqs/statistics/stepwise-regression-problems/) [CK: note that they are assuming no cross-validation.]
+* [Regression Modeling Strategies](https://smile.amazon.com/Regression-Modeling-Strategies-Applications-Statistics-ebook/dp/B0140XQAXI), section 4.3.
+* [Statistical Learning from a Regression Perspective](https://smile.amazon.com/Statistical-Learning-Regression-Perspective-Statistics-ebook/dp/B01M333153) section 1.4.6.
