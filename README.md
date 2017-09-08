@@ -20,15 +20,7 @@ Alternating Fridays 9/8 to 12/15 from 12:30-2:00pm in the D-Lab Convening Room (
 
 - September 8: BRC Savio lightening talk, introduction, resources, dataset; feed forward and deep feed forward neural networks
 
-  - See [R examples here]()
-
-  - See [Python examples here]()
-
 - September 22: Benten lightening talk(?); convolutional neural networks
-
-  - See [R examples here]()
-
-  - See [Python examples here]()
 
 October 6:  
 October 20:  
