@@ -32,7 +32,7 @@ devtools::install_github(github_packages)
 ck37r::load_packages(names(github_packages))
 
 # Load required non-github packages and install from CRAN if necessary.
-ck37r::load_packages(packages, install = T)
+ck37r::load_packages(packages, auto_install = T, verbose = T)
 
 # Also install mxnet for potential usage.
 # This unfortunately is Mac/Windows only; probably will not work for Linux.
@@ -54,7 +54,7 @@ if (F) {
 }
 
 # Clean up variables.
-rm(packages, success, github_packages)
+rm(packages, github_packages)
 ```
 
 # Background
@@ -160,7 +160,8 @@ summary(pred)
 # Calculate mean-squared error (MSE).
 mean((pred - Y_reg)^2)
 
-# And root mean squared error (RMSE).
+# And root mean squared error (RMSE), which is on the original scale
+# of the outcome variable (easier to interpret).
 sqrt(mean((pred - Y_reg)^2))
 
 ```
@@ -181,6 +182,7 @@ Challenge: use h2o to design this.
 library(h2o)
 # Startup and connect to our existing h2o cluster.
 # Use all available threads.
+# Could increase ram with option (e.g.) max_mem_size = "8g"
 h2o.init(nthreads = -1)
 
 # Clean slate - just in case the cluster was already running.
@@ -194,9 +196,31 @@ outcome = "_outcome"
 x = colnames(X_df)
 
 # Fit the deep learning model here.
+# key optional arguments:
+# hidden = c(200, 200)
+# epochs = 10
+# seed = -1
+# rate_decay = 1
+# reproducible = FALSE
+# See ?h2.deeplearning for more - huge variety of configurations
+model = h2o.deeplearning(x = x, y = outcome,
+                         training_frame = data,
+                         nfolds = 10)
+
+# Review model, in particular the cross-validation section.
+model
+
+# Estimate model performance on another data set.
+# Could be a test set but here it's just the resubstitution performance.
+# So this is more biased than the cross-validated results reported above.
+h2o.performance(model, data)
 
 # Shutdown server when we're done.
+# This will also happen automatically if we close RStudio, provided
+# the server was started within R.
 h2o.shutdown(prompt = F)
 ```
 
 See also Erin LeDell's [excellent tutorial on deep learning](https://github.com/ledell/useR-machine-learning-tutorial/blob/master/deep-neural-networks.Rmd).
+
+## To add: Keras and mxnet versions.
