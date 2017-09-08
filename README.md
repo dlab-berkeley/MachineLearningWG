@@ -10,7 +10,7 @@ This semester's topic is neural networks for image processing!
 
 [Practice with quick tutorials thanks to fast.ai here ](http://course.fast.ai/) and [here](https://github.com/fastai/courses/tree/master/deeplearning1/nbs)
 
-[View what a semester long course on convolutional neural networks would look like here](http://cs231n.stanford.edu/syllabus.html)
+[View what a ten-week course on convolutional neural networks would look like here](http://cs231n.stanford.edu/syllabus.html)
 
 ### Dataset
 We will be using [The Nature Convervancy Fisheries Monitoring dataset](https://www.kaggle.com/c/the-nature-conservancy-fisheries-monitoring) for the walkthroughs this semester. 
