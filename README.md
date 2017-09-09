@@ -18,9 +18,9 @@ We will be using [The Nature Convervancy Fisheries Monitoring dataset](https://w
 ### Schedule
 Alternating Fridays 9/8 to 12/15 from 12:30-2:00pm in the D-Lab Convening Room (356B Barrows). 
 
-- September 8: BRC Savio lightening talk, introduction, resources, dataset; feed forward and deep feed forward neural networks
+- September 8: BRC Savio lightning talk, introduction, resources, dataset; feed forward and deep feed forward neural networks
 
-- September 22: Benten lightening talk(?); convolutional neural networks
+- September 22: Benten lightning talk(?); convolutional neural networks
 
 October 6:  
 October 20:  
@@ -31,9 +31,9 @@ December 15:
 
 We are always looking for student/staff/faculty presenters. Please contact us if you are interested!  
 
-[The Spring 2017 folder](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/MLWG_Spring2017) covers: k-nearest neighbor classification and regression, stepwise regression, linear and polynomial regression and polynomial and smoothing splines, multivariate adaptive regression splines and generalized additive models, support vector machines, and introductions to neural networks.
+[The Spring 2017 folder](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Spring2017) covers: k-nearest neighbor classification and regression, stepwise regression, linear and polynomial regression and polynomial and smoothing splines, multivariate adaptive regression splines and generalized additive models, support vector machines, and introductions to neural networks.
 
-[The Fall 2016 folder](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/MLWG_Fall2016) covers: decision trees, random forests, penalized regression, and boosting.
+[The Fall 2016 folder](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Fall2016) covers: decision trees, random forests, penalized regression, and boosting.
 
 More information on the [D-Lab MLWG website](http://dlab.berkeley.edu/working-groups/machine-learning-working-group)
 
