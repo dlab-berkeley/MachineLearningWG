@@ -19,7 +19,7 @@ Much of this code is borrowed directly from the below examples. Read the origina
 
 Todo:  
 - Results are probably incorrect.  
-- AUC plotting does not work.  
+- AUC plotting does not work. 
 
 # 1.  Install required packages
 For this example: EBImage, mxnet, ggplot2, imager, jpeg, pROC
@@ -54,6 +54,7 @@ library(pROC)
 Be sure to also check out: 
 ```{r, eval = F}
 # h2o - https://www.h2o.ai/
+# check out Deep Water - https://www.h2o.ai/deep-water/
 install.packages("h2o")
 library(h2o)
 
@@ -77,11 +78,8 @@ koi_fish_EB
 par(mfrow=c(1,2)); plot(koi_fish_EB)
 # imageData(koi_fish_EB)
 
-<<<<<<< HEAD
 koi_fish = imager::load.image("Fall2017/Sep22-images-cnn/images-cnn-R/image_001.jpg") # same image 
-=======
-koi_fish = imager::load.image("/Fall2017/Sep22-images-cnn/images-cnn-R/image_001.jpg") # same image 
->>>>>>> 2a4f420b33b91d24cfc7fa3597cbf29fab9aa85f
+
 class(koi_fish) # different class? # http://www.cimg.eu/
 koi_fish
 plot(koi_fish)
@@ -221,11 +219,7 @@ shrink(pix,5) %>% highlight(col="blue", lwd = 3)
 #https://github.com/Apress/intro-to-deep-learning-using-r
 
 #Downloading the strings of the image files in each directory
-<<<<<<< HEAD
 fish_photos = list.files("Fall2017/Sep22-images-cnn/images-cnn-R")
-=======
-fish_photos = list.files("/Fall2017/Sep22-images-cnn/images-cnn-R")
->>>>>>> 2a4f420b33b91d24cfc7fa3597cbf29fab9aa85f
 fish_photos
 
 #Preprocessing
@@ -234,11 +228,7 @@ img_data = data.frame()
 
 #Turning Photos into Bitmaps
 for (i in 1:length(fish_photos)){
-<<<<<<< HEAD
   img = readJPEG(paste("Fall2017/Sep22-images-cnn/images-cnn-R/", fish_photos[i], sep = ""))
-=======
-  img = readJPEG(paste("/Fall2017/Sep22-images-cnn/images-cnn-R/", fish_photos[i], sep = ""))
->>>>>>> 2a4f420b33b91d24cfc7fa3597cbf29fab9aa85f
   
   #Reshape to 64x64 pixel size and grayscale image
   img = Image(img, dim = c(64, 64), color = "grayscale")
@@ -292,12 +282,12 @@ data = mx.symbol.Variable('data')
 #Layer 1
 convolution_l1 = mx.symbol.Convolution(data = data, kernel = c(5,5), num_filter = 20)
 sigmoid_l1 = mx.symbol.Activation(data = convolution_l1, act_type = "sigmoid")
-pooling_l1 = mx.symbol.Pooling(data = sigmoid_l1, pool_type = "max", kernel = c(1,1), stride = c(1,1))
+pooling_l1 = mx.symbol.Pooling(data = sigmoid_l1, pool_type = "max", kernel = c(5,5), stride = c(2,2))
 
 #Layer 2
 convolution_l2 = mx.symbol.Convolution(data = pooling_l1, kernel = c(3,3), num_filter = 10)
 sigmoid_l2 = mx.symbol.Activation(data = convolution_l2, act_type = "sigmoid")
-pooling_l2 = mx.symbol.Pooling(data = sigmoid_l2, pool_type = "max", kernel = c(1,1), stride = c(1,1))
+pooling_l2 = mx.symbol.Pooling(data = sigmoid_l2, pool_type = "max", kernel = c(3,3), stride = c(2,2))
 
 #Fully Connected 1
 fl = mx.symbol.Flatten(data = pooling_l2)
@@ -321,11 +311,12 @@ CPU = mx.cpu()
 for (i in 1:length(learn_rate)){
   
   cnn_model = mx.model.FeedForward.create(CNN, X = x_train, y = y_train, ctx = CPU,
-                                           num.round = 50, array.batch.size = 40,
+                                           num.round = 50, array.batch.size = 4,
                                            learning.rate = learn_rate[i],
                                            momentum = 0.9, eval.metric = mx.metric.accuracy,
                                            epoch.end.callback = mx.callback.log.train.metric(100), optimizer = "sgd")
   #Calculating Training Accuracy
+  # need prediction from softmax layer; not fully connected layer
   y_h = predict(cnn_model, x_train)
   Labels = max.col(t(y_h)) - 1
   AUC = append(AUC, roc(as.factor(y_train), as.numeric(Labels))$auc[1])
