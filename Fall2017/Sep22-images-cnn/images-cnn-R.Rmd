@@ -71,13 +71,13 @@ install_tensorflow()
 
 # 2.  Load and edit a single free image of koi fish. 
 ```{r}
-koi_fish_EB = EBImage::readImage("/Users/evan.muzzall/Desktop/MachineLearningWG/Fall2017/Sep22-images-cnn/images-cnn-R/image_001.jpg") # load fullsize color image
+koi_fish_EB = EBImage::readImage("Fall2017/Sep22-images-cnn/images-cnn-R/image_001.jpg") # load fullsize color image
 class(koi_fish_EB)
 koi_fish_EB
 par(mfrow=c(1,2)); plot(koi_fish_EB)
 # imageData(koi_fish_EB)
 
-koi_fish = imager::load.image("/Users/evan.muzzall/Desktop/MachineLearningWG/Fall2017/Sep22-images-cnn/images-cnn-R/image_001.jpg") # same image 
+koi_fish = imager::load.image("Fall2017/Sep22-images-cnn/images-cnn-R/image_001.jpg") # same image 
 class(koi_fish) # different class? # http://www.cimg.eu/
 koi_fish
 plot(koi_fish)
@@ -217,7 +217,7 @@ shrink(pix,5) %>% highlight(col="blue", lwd = 3)
 #https://github.com/Apress/intro-to-deep-learning-using-r
 
 #Downloading the strings of the image files in each directory
-fish_photos = list.files("/Users/evan.muzzall/Desktop/MachineLearningWG/Fall2017/Sep22-images-cnn/images-cnn-R")
+fish_photos = list.files("Fall2017/Sep22-images-cnn/images-cnn-R")
 fish_photos
 
 #Preprocessing
@@ -226,7 +226,7 @@ img_data = data.frame()
 
 #Turning Photos into Bitmaps
 for (i in 1:length(fish_photos)){
-  img = readJPEG(paste("/Users/evan.muzzall/Desktop/MachineLearningWG/Fall2017/Sep22-images-cnn/images-cnn-R/", fish_photos[i], sep = ""))
+  img = readJPEG(paste("Fall2017/Sep22-images-cnn/images-cnn-R/", fish_photos[i], sep = ""))
   
   #Reshape to 64x64 pixel size and grayscale image
   img = Image(img, dim = c(64, 64), color = "grayscale")
