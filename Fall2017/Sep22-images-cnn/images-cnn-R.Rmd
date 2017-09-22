@@ -15,7 +15,7 @@ Image processing and neural networks are both paramount to machine learning. Thi
 Much of this code is borrowed directly from the below examples. Read the original documentation to learn much more:  
 - [EBImage](http://bioconductor.org/packages/release/bioc/html/EBImage.html)  
 - [imager](https://dahtah.github.io/imager/)  
-- [mxnet](https://mxnet.incubator.apache.org/)  
+- [mxnet](https://mxnet.incubator.apache.org/) and [code](https://github.com/Apress/intro-to-deep-learning-using-r)
 
 Todo:  
 - Results are probably incorrect.  
