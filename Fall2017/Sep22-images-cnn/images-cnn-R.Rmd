@@ -77,7 +77,11 @@ koi_fish_EB
 par(mfrow=c(1,2)); plot(koi_fish_EB)
 # imageData(koi_fish_EB)
 
+<<<<<<< HEAD
 koi_fish = imager::load.image("Fall2017/Sep22-images-cnn/images-cnn-R/image_001.jpg") # same image 
+=======
+koi_fish = imager::load.image("/Fall2017/Sep22-images-cnn/images-cnn-R/image_001.jpg") # same image 
+>>>>>>> 2a4f420b33b91d24cfc7fa3597cbf29fab9aa85f
 class(koi_fish) # different class? # http://www.cimg.eu/
 koi_fish
 plot(koi_fish)
@@ -217,7 +221,11 @@ shrink(pix,5) %>% highlight(col="blue", lwd = 3)
 #https://github.com/Apress/intro-to-deep-learning-using-r
 
 #Downloading the strings of the image files in each directory
+<<<<<<< HEAD
 fish_photos = list.files("Fall2017/Sep22-images-cnn/images-cnn-R")
+=======
+fish_photos = list.files("/Fall2017/Sep22-images-cnn/images-cnn-R")
+>>>>>>> 2a4f420b33b91d24cfc7fa3597cbf29fab9aa85f
 fish_photos
 
 #Preprocessing
@@ -226,7 +234,11 @@ img_data = data.frame()
 
 #Turning Photos into Bitmaps
 for (i in 1:length(fish_photos)){
+<<<<<<< HEAD
   img = readJPEG(paste("Fall2017/Sep22-images-cnn/images-cnn-R/", fish_photos[i], sep = ""))
+=======
+  img = readJPEG(paste("/Fall2017/Sep22-images-cnn/images-cnn-R/", fish_photos[i], sep = ""))
+>>>>>>> 2a4f420b33b91d24cfc7fa3597cbf29fab9aa85f
   
   #Reshape to 64x64 pixel size and grayscale image
   img = Image(img, dim = c(64, 64), color = "grayscale")
