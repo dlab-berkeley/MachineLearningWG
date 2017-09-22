@@ -17,6 +17,7 @@ Much of this code is borrowed directly from the below examples. Read the origina
 - [imager](https://dahtah.github.io/imager/)  
 - [mxnet](https://mxnet.incubator.apache.org/)  
 
+Todo:  
 - Results are probably incorrect.  
 - AUC plotting does not work.  
 
