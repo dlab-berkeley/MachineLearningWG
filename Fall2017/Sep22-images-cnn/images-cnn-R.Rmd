@@ -1,0 +1,376 @@
+---
+title: "images-cnn-R  super rough draft"
+author: "Evan Muzzall"
+date: "9/22/2017"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+---
+
+Image processing and neural networks are both paramount to machine learning. This markdown is a mere compilation of useful examples from the EBImage, imager, and mxnet R packages. The goal is to provide a summary of basic concepts of how images can be processed and submitted to a convolutional neural network in R. 
+
+Much of this code is borrowed directly from the below examples. Read the original documentation to learn much more:  
+- [EBImage](http://bioconductor.org/packages/release/bioc/html/EBImage.html)  
+- [imager](https://dahtah.github.io/imager/)  
+- [mxnet](https://mxnet.incubator.apache.org/)  
+
+- Results are probably incorrect.  
+- AUC plotting does not work.  
+
+# 1.  Install required packages
+For this example: EBImage, mxnet, ggplot2, imager, jpeg, pROC
+```{r, eval = F}
+# EBImage
+source("https://bioconductor.org/biocLite.R")
+biocLite("EBImage")
+
+# mxnet
+cran = getOption("repos")
+cran["dmlc"] = "https://apache-mxnet.s3-accelerate.dualstack.amazonaws.com/R/CRAN/" 
+  # https://github.com/dmlc
+  # https://github.com/dmlc/drat
+options(repos = cran)
+install.packages("mxnet")
+library(mxnet)
+
+# ggplot2, imager, jpeg, pROC
+install.packages(c("ggplot2", "imager", "jpeg", "pROC"))
+```
+
+Library
+```{r}
+library(EBImage)
+library(mxnet)
+library(ggplot2)
+library(imager)
+library(jpeg)
+library(pROC)
+```
+
+Be sure to also check out: 
+```{r, eval = F}
+# h2o - https://www.h2o.ai/
+install.packages("h2o")
+library(h2o)
+
+# keras - https://keras.rstudio.com/
+install.packages("keras")
+library(keras)
+# install_keras(method = "conda")
+install_keras()
+
+# tensorflow - https://tensorflow.rstudio.com/tensorflow/articles/installation.html
+install.packages("tensorflow")
+library(tensorflow)
+install_tensorflow()
+```
+
+# 2.  Load and edit a single free image of koi fish. 
+```{r}
+koi_fish_EB = EBImage::readImage("/Users/evan.muzzall/Desktop/ml_images/images/image_001.jpg") # load fullsize color image
+class(koi_fish_EB)
+koi_fish_EB
+par(mfrow=c(1,2)); plot(koi_fish_EB)
+# imageData(koi_fish_EB)
+
+koi_fish = imager::load.image("/Users/evan.muzzall/Desktop/ml_images/images/image_001.jpg") # same image 
+class(koi_fish) # different class? # http://www.cimg.eu/
+koi_fish
+plot(koi_fish)
+# as.array(koi_fish)
+
+# shorter names
+koiEB = koi_fish_EB
+koi = koi_fish
+```
+
+# 3.  EBImage
+### 3.1 get basic info
+```{r}
+plot(koiEB)
+plot(max(koiEB) - koiEB) # do math stuff! (see below)
+par(mfrow=c(1,1)); hist(koiEB, lwd = 2) # RGB intensity
+
+# View image data
+attributes(koiEB)
+attributes(koi)
+```
+
+### 3.2 fast manipulations
+```{r}
+# + / - brightness
+koiEB1 = koiEB + 0.5
+koiEB2 = koiEB - 0.5
+par(mfrow=c(1,2)); plot(koiEB1); plot(koiEB2)
+
+# * contrast
+koiEB3 = koiEB * 0.25
+koiEB4 = koiEB * 5
+plot(koiEB3); plot(koiEB4)
+
+# ^ gamma correction
+koiEB5 = koiEB ^ 10
+koiEB6 = koiEB ^ 0.75
+plot(koiEB5); plot(koiEB6)
+
+# flip, rotate, translate, rotate/translate
+koiEB7 = flip(koiEB)
+koiEB8 = rotate(koiEB, 45)
+koiEB9 = translate(koiEB, c(500, 0))
+koiEB10 = translate(rotate(koiEB, 45), c(0, 500))
+par(mfrow=c(1,4)); plot(koiEB7); plot(koiEB8); plot(koiEB9); plot(koiEB10)
+
+# grayscale frames 
+koiEB9 = koiEB
+koiEB9 # frames.render
+colorMode(koiEB9) = Grayscale
+par(mfrow=c(1,1)); plot(koiEB9)
+plot(koiEB9, all = T)
+attributes(koiEB9)
+# imageData(koiEB9)
+```
+
+# 4.  imager
+```{r}
+# load a URL! 
+cartoon = load.image("https://carboncostume.com/wordpress/wp-content/uploads/2013/04/Calvin-and-Hobbes.jpg")
+plot(cartoon)
+
+# basic info
+plot(koi) # coordinates appear, etc. 
+
+# what is noise?
+# set.seed(1)
+noise = array(runif(5*5*5*3),c(5,5,5,3)) #5x5 pixels, 5 frames, 3 colors. All noise
+
+# the color channel comma cascade:
+noise[,,,1] # multiple frames of a single color channel
+noise[,,1,1] # single frame
+noise[,1,1,1] # col
+noise[1,,1,1] # row
+
+noise = as.cimg(noise) # convert it back to handy cimg format
+plot(noise) #, frame = 2)
+
+# make a grayscale copy
+koi_g = grayscale(koi)
+plot(koi_g)
+```
+
+### 4.2 convert to data frame and ggplot2
+```{r}
+# convert to data frame
+koi_df = as.data.frame(koi)
+head(koi_df) # aha! we have an xy coordinate, color channel, and pixel value
+koi_df = plyr::mutate(koi_df, channel = factor(cc, labels=c("Red","Green", "Blue")))
+head(koi_df) # relabel color channel
+
+# Look at rgb channels of the color image
+ggplot(koi_df, aes(value, fill = channel)) + 
+  geom_histogram(bins=30) + 
+  facet_wrap(~ channel) + 
+  theme_minimal() + 
+  guides(fill = F)
+
+# gradients
+gr = imgradient(koi_g,"xy")
+gr
+plot(gr)
+```
+
+### 4.3 pixsets for quick binary image highlighting
+```{r}
+# pixsets
+pix = koi_g > .6 # Select pixels with high luminance
+pix
+plot(pix)
+
+# highlight contours using pixel sets
+pix = (isoblur(koi_g, 4)  > .5 )
+highlight(pix)
+
+# highlight certain areas
+plot(koi_g)
+# Start the fill at location (900,400). sigma sets the tolerance
+px.flood(koi_g,900, 400,sigma=.35) %>% highlight
+
+# or, just plot boundaries
+plot(boundary(pix))
+
+# basic morphological image processing - https://www.cs.auckland.ac.nz/courses/compsci773s1c/lectures/ImageProcessing-html/topic4.htm
+plot(koi)
+highlight(pix)
+
+#Grow by 5 pixels
+grow(pix,5) %>% highlight(col="green", lwd = 3)
+#Shrink by 5 pixels
+shrink(pix,5) %>% highlight(col="blue", lwd = 3)
+```
+
+# 5.  mxnet
+```{r}
+#Below is a replication of Taweh Beysolow II / gwens CNN instructions: 
+#https://github.com/Apress/intro-to-deep-learning-using-r
+
+#Downloading the strings of the image files in each directory
+fish_photos = list.files("/Users/evan.muzzall/Desktop/ml_images/images")
+fish_photos
+
+#Preprocessing
+#Downloading the image data 
+img_data = data.frame()
+
+#Turning Photos into Bitmaps
+for (i in 1:length(fish_photos)){
+  img = readJPEG(paste("/Users/evan.muzzall/Desktop/ml_images/images/", fish_photos[i], sep = ""))
+  
+  #Reshape to 64x64 pixel size and grayscale image
+  img = Image(img, dim = c(64, 64), color = "grayscale")
+  
+  #Resizing Image to 28x28 Pixel Size
+  img = Image(img, dim = c(28, 28))
+  img = img@.Data
+  
+  #Transforming to vector
+  img = as.vector(t(img))
+  
+  #Adding Label 
+  label = 1
+  
+  img = c(label, img)
+  
+  #Appending to List
+  img_data = rbind(img_data, img)
+  
+}
+
+#Transforming data into matrix for input into CNN 
+training_set = data.matrix(img_data)
+training_set = as.data.frame(training_set)
+# names(training_set)
+training_set$X1 = c(c(rep(1,15), rep(0,5))) # quickly relabel class: koi (1) or not koi (0). 
+
+set.seed(1)
+#Cross Validating Results 
+rows = sample(1:nrow(training_set), nrow(training_set)*.75)
+rows
+
+#Training Set
+x_train = t(training_set[rows, -1])
+y_train = training_set[rows, 1]
+dim(x_train) = c(28,28, 1, ncol(x_train))
+
+#Test Set
+x_test = t(training_set[-rows, -1])
+y_test = training_set[-rows, 1]
+dim(x_test) = c(28,28, 1, ncol(x_test))
+
+#####################################
+#Building Convolutional Neural Network 
+#We will use a LeNet Architecture for this example. Readers may feel free to experiment by using alternative arhcitectures 
+
+# this example uses a sigmoid activation type
+
+data = mx.symbol.Variable('data')
+
+#Layer 1
+convolution_l1 = mx.symbol.Convolution(data = data, kernel = c(5,5), num_filter = 20)
+sigmoid_l1 = mx.symbol.Activation(data = convolution_l1, act_type = "sigmoid")
+pooling_l1 = mx.symbol.Pooling(data = sigmoid_l1, pool_type = "max", kernel = c(1,1), stride = c(1,1))
+
+#Layer 2
+convolution_l2 = mx.symbol.Convolution(data = pooling_l1, kernel = c(3,3), num_filter = 10)
+sigmoid_l2 = mx.symbol.Activation(data = convolution_l2, act_type = "sigmoid")
+pooling_l2 = mx.symbol.Pooling(data = sigmoid_l2, pool_type = "max", kernel = c(1,1), stride = c(1,1))
+
+#Fully Connected 1
+fl = mx.symbol.Flatten(data = pooling_l2)
+full_conn1 = mx.symbol.FullyConnected(data = fl, num_hidden = 500)
+sigmoid_l3 = mx.symbol.Activation(data = full_conn1, act_type = "sigmoid")
+
+#Fully Connected 2
+full_conn2 = mx.symbol.FullyConnected(data = sigmoid_l3, num_hidden = 40)
+
+#Softmax Classification Layer 
+CNN = mx.symbol.SoftmaxOutput(data = full_conn2)
+
+##################################################################################################
+#Model Training and Parameter Tuning
+mx.set.seed(1)
+#Learning Rate Parameter
+AUC = c()
+learn_rate = c(0.01, 0.02, 0.03, 0.10)
+CPU = mx.cpu()
+
+for (i in 1:length(learn_rate)){
+  
+  cnn_model = mx.model.FeedForward.create(CNN, X = x_train, y = y_train, ctx = CPU,
+                                           num.round = 50, array.batch.size = 40,
+                                           learning.rate = learn_rate[i],
+                                           momentum = 0.9, eval.metric = mx.metric.accuracy,
+                                           epoch.end.callback = mx.callback.log.train.metric(100), optimizer = "sgd")
+  #Calculating Training Accuracy
+  y_h = predict(cnn_model, x_train)
+  Labels = max.col(t(y_h)) - 1
+  AUC = append(AUC, roc(as.factor(y_train), as.numeric(Labels))$auc[1])
+  
+}
+
+# learn about momentum and learning rate adaptation here: 
+# https://www.willamette.edu/~gorr/classes/cs449/momrate.html
+
+#Plotting AUC
+plot(learn_rate, AUC, main = "AUC for CNN \n Training Learning Rate Parameter", xlab = "learning rate", 
+     ylab = "AUC Score", type = "l", col = "cadetblue")
+
+#Momentum Parameter
+mx.set.seed(1)
+AUC1 = c()
+mom = c(0.5, 0.9, 1.5)
+CPU = mx.cpu()
+
+for (i in 1:length(mom)){
+  
+  cnn_model = mx.model.FeedForward.create(CNN, X = x_train, y = y_train, ctx = CPU,
+                                           num.round = 50, array.batch.size = 40,
+                                           learning.rate = 0.04,
+                                           momentum = mom[i], eval.metric = mx.metric.accuracy,
+                                           epoch.end.callback = mx.callback.log.train.metric(100), optimizer = "sgd")
+  #Calculating Training Accuracy
+  y_h = predict(cnn_model, x_train)
+  Labels = max.col(t(y_h)) - 1
+  AUC1 = append(AUC1, roc(as.factor(y_train), as.numeric(Labels))$auc[1])
+  
+}
+
+#Plotting AUC
+plot(mom, AUC1, main = "AUC for CNN \n Training Momentum Parameter", xlab = "momentum", 
+     ylab = "AUC Score", type = "l", col = "cadetblue")
+
+##################################################################################################
+#Fitted Model Training
+cnn_model = mx.model.FeedForward.create(CNN, X = x_train, y = y_train, ctx = CPU,
+                                         num.round = 150, array.batch.size = 40,
+                                         learning.rate = 0.04, momentum = 0.9, eval.metric = mx.metric.accuracy,
+                                         optimizer = "sgd")
+#Calculating Training Set Accuracy
+y_h = predict(cnn_model, x_train)
+Labels = max.col(t(y_h)) - 1
+roc(as.factor(y_train), as.numeric(Labels))
+curve = roc(as.factor(y_train), as.numeric(Labels))
+
+#Plotting Results
+plot(curve, main = "ROC Curve for Convolutional Neural Network \n Train Set")
+
+#Calculating Test Set Accuracy
+y_h = predict(cnn_model, x_test)
+Labels = max.col(t(y_h)) - 1
+roc(as.factor(y_test), as.numeric(Labels))
+curve1 = roc(as.factor(y_test), as.numeric(Labels))
+
+#Plotting Results
+plot(curve1, main = "ROC Curve for Convolutional Neural Network \n Test Set")
+```
