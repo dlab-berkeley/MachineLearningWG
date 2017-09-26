@@ -20,6 +20,7 @@ Much of this code is borrowed directly from the below examples. Read the origina
 Todo:  
 - Results are probably incorrect.  
 - AUC plotting does not work. 
+- Fix accuracy  
 
 # 1.  Install required packages
 For this example: EBImage, mxnet, ggplot2, imager, jpeg, pROC
