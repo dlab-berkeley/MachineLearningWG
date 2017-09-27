@@ -23,6 +23,7 @@ Alternating Fridays 9/8 to 12/15 from 12:30-2:00pm in the D-Lab Convening Room (
 - September 22: Benten lightning talk(?); convolutional neural networks
 
 - October 6:  lightning talks!  
+
 October 20:  
 November 3:  
 November 17:  
