@@ -1,0 +1,25 @@
+Machine Learning Working Group Fall 2017
+
+This semester's topic is neural networks for image processing! 
+
+[Click to find out where neural networks might fit in the data science universe, by Swami Chandrasekaran](http://nirvacana.com/thoughts/becoming-a-data-scientist/)  
+
+[Check out the Neural Network Zoo, by Fjodor Van Veen](http://www.asimovinstitute.org/neural-network-zoo/)
+
+[View this post for a classic StackExchange response to the question "What does the hidden layer in a  neural network compute?"](https://stats.stackexchange.com/questions/63152/what-does-the-hidden-layer-in-a-neural-network-compute)
+
+[Practice with quick tutorials thanks to fast.ai here ](http://course.fast.ai/) and [here](https://github.com/fastai/courses/tree/master/deeplearning1/nbs)
+
+[View what a ten-week course on convolutional neural networks would look like here](http://cs231n.stanford.edu/syllabus.html)
+
+### Dataset
+We will be using [The Nature Convervancy Fisheries Monitoring dataset](https://www.kaggle.com/c/the-nature-conservancy-fisheries-monitoring) for the walkthroughs this semester. 
+
+### Schedule
+Alternating Fridays 9/8 to 12/15 from 12:30-00pm in the D-Lab Convening Room (356B Barrows). 
+
+- September 8: BRC Savio lightning talk, introduction, resources, dataset; feed forward and deep feed forward neural networks
+
+- September 22: Benten lightning talk(?); convolutional neural networks
+
+- October 6:  lightning talks!  
