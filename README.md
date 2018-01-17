@@ -1,36 +1,24 @@
-# Machine Learning Working Group Fall 2017
+# Machine Learning Working Group Spring 2018
 
-This semester's topic is neural networks for image processing! 
+In Spring 2018 MWLG will revisit some traditional algorithms:  
 
-[Click to find out where neural networks might fit in the data science universe, by Swami Chandrasekaran](http://nirvacana.com/thoughts/becoming-a-data-scientist/)  
+January 31: k-nearest neighbor  
 
-[Check out the Neural Network Zoo, by Fjodor Van Veen](http://www.asimovinstitute.org/neural-network-zoo/)
+February 14: decision tree  
 
-[View this post for a classic StackExchange response to the question "What does the hidden layer in a  neural network compute?"](https://stats.stackexchange.com/questions/63152/what-does-the-hidden-layer-in-a-neural-network-compute)
+February 28: random forest  
 
-[Practice with quick tutorials thanks to fast.ai here ](http://course.fast.ai/) and [here](https://github.com/fastai/courses/tree/master/deeplearning1/nbs)
+March 14: lightning talks  
 
-[View what a ten-week course on convolutional neural networks would look like here](http://cs231n.stanford.edu/syllabus.html)
+April 11: gradient boosting  
 
-### Dataset
-We will be using [The Nature Convervancy Fisheries Monitoring dataset](https://www.kaggle.com/c/the-nature-conservancy-fisheries-monitoring) for the walkthroughs this semester. 
+April 25: elastic net  
 
-### Schedule
-Alternating Fridays 9/8 to 12/15 from 12:30-2:00pm in the D-Lab Convening Room (356B Barrows). 
+May 9: lightning talks  
 
-- September 8: BRC Savio lightning talk, introduction, resources, dataset; feed forward and deep feed forward neural networks
+We are always looking for student/staff/faculty presenters. Please contact us if you are interested! 
 
-- September 22: Benten lightning talk(?); convolutional neural networks
-
-- October 6:  lightning talks!  
-
-October 20:  
-November 3:  
-November 17:  
-December 1:  
-December 15:  
-
-We are always looking for student/staff/faculty presenters. Please contact us if you are interested!  
+[The Fall 2017 folder](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Fall2017) covers some basics of neural networks for image processing. 
 
 [The Spring 2017 folder](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Spring2017) covers: k-nearest neighbor classification and regression, stepwise regression, linear and polynomial regression and polynomial and smoothing splines, multivariate adaptive regression splines and generalized additive models, support vector machines, and introductions to neural networks.
 
