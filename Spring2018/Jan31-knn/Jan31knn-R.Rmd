@@ -15,15 +15,21 @@ knitr::opts_chunk$set(echo = TRUE, fig.width=9, fig.height=6, width=160)
 #0. Package installation
 Today we will use the following packages. Although we won't use it today, we recommend installing "SuperLearner" as well. 
 ```{r, eval=FALSE}
-install.packages(c("caret", "chemometrics", "class", "FNN", "gmodels", "ggplot2", "MASS", "SuperLearner"), dependencies = T)
+install.packages(c("caret", "chemometrics", "class", "FNN", "gmodels",
+                   "ggplot2", "MASS", "glmnet", "rpart", "randomForest", 
+                   "xgboost", "SuperLearner"), dependencies = T)
 library(caret)
 library(chemometrics)
 library(class)
 library(FNN)
-library(gmodels)
+library(glmnet)
 library(ggplot2)
+library(gmodels)
 library(MASS)
+library(randomForest)
+library(rpart)
 library(SuperLearner)
+library(xgboost)
 ```
 
 #1. What is k-Nearest Neighbors? (knn)
@@ -71,6 +77,8 @@ Boston$dis = cut(Boston$dis,
                   labels=c("short", "medium", "long"))
 table(Boston$dis)
 ```
+
+Furthermore, it is wise to often expand your factors out into indicators. See `?model.matrix` to learn more.  
 
 #3. Choosing a proper k
 The "k" in knn represents the number of other "neighboring" data points used to classify the point in question. Consider the bias-variance tradeoff when choosing a proper "k".  
@@ -284,6 +292,9 @@ library(SuperLearner)
 listWrappers() # these are default, untuted algorithms
 alg_library = c("SL.mean", "SL.glmnet", "SL.rpart", "SL.randomForest", "SL.xgboost", "SL.knn") # define library of algorithms to be included 
 
+# check out the code for one of the algorithms
+SL.xgboost
+
 set.seed(1)
 # fit the model 
 system.time({
@@ -291,9 +302,12 @@ system.time({
                   SL.library = alg_library)
 })
 
+# What is best single learner?
+table(simplify2array(cv_sl$whichDiscreteSL))
+
 summary(cv_sl)
 
-plot(cv_sl, col = "blue") + 
+plot(cv_sl) + 
   theme_minimal()
 ```
 On the R side of things, we will incorporate SuperLearner often throughout the semester! This code is graciously borrowed form some of the below materials: 
