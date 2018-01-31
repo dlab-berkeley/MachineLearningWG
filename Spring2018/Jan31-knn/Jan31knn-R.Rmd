@@ -1,0 +1,311 @@
+---
+title: "k-nearest neighbor classification and regression"
+author: "Evan Muzzall"
+date: "1/31/2018"
+output: 
+  html_document: 
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width=9, fig.height=6, width=160)
+```
+
+#0. Package installation
+Today we will use the following packages. Although we won't use it today, we recommend installing "SuperLearner" as well. 
+```{r, eval=FALSE}
+install.packages(c("caret", "chemometrics", "class", "FNN", "gmodels", "ggplot2", "MASS", "SuperLearner"), dependencies = T)
+library(caret)
+library(chemometrics)
+library(class)
+library(FNN)
+library(gmodels)
+library(ggplot2)
+library(MASS)
+library(SuperLearner)
+```
+
+#1. What is k-Nearest Neighbors? (knn)
+knn categorizes data based on similarities with their "nearest" neighbors. It can be thought of as non-parametric instance-based learning as it makes no assumptions about the underlying data structure.  
+
+knn is distance based and acts as a sort of "dimension reduction" method in that data are treated as coordinates in a multidimensional feature space so that groups can be identified. 
+
+Euclidean distance is one standard for this algorithm and the distance we will use today. However, many consider Mahalanobis distance a more appropriate multivariate distance for knn and other statistical tests. See for example:  
+
+[Weinberger et al. 2009. Distance Metric Learning for Large Margin
+Nearest Neighbor Classification. Journal of Machine Learning Reseach 10: 207-244](http://jmlr.csail.mit.edu/papers/volume10/weinberger09a/weinberger09a.pdf)
+
+#2. The data
+Load the "Boston" housing dataset from the "MASS" R package and check it out:
+```{r}
+library(MASS)
+data(Boston)
+```
+
+Investigate the data:
+```{r, eval=FALSE}
+head(Boston) # quick look
+?Boston # investigate the variable definitions; the original research papers
+str(Boston) # view the compact structure
+View(Boston) # see all the data 
+```
+
+Today we will walk through classification and then regression using knn. For classification, the response variable should be a factor. For regression, the response variable should be numeric.  
+
+#Let's make a copy of the Boston dataset named `B_reg` for the regression example below. 
+```{r}
+B_reg = Boston
+```
+
+Time to get creative! Let's do a little data wrangling and coerce the "dis" variable (weighted mean of distances to five Boston employment centers) into a factor category. The distances will now be categorized as "short", "medium", or "long". This will serve as our target variable for the classificaiton example. 
+```{r, eval = F}
+?cut
+```
+```{r}
+summary(Boston$dis)
+boxplot(Boston$dis)
+Boston$dis = cut(Boston$dis, 
+                  breaks=c(0, 3, 6, 13),
+                  levels=c(1,2,3),
+                  labels=c("short", "medium", "long"))
+table(Boston$dis)
+```
+
+#3. Choosing a proper k
+The "k" in knn represents the number of other "neighboring" data points used to classify the point in question. Consider the bias-variance tradeoff when choosing a proper "k".  
+
+[Click here for Jason Brownlee's excellent introduction to the bias-variance tradeoff](http://machinelearningmastery.com/gentle-introduction-to-the-bias-variance-trade-off-in-machine-learning/)  
+
+For example, **if we choose a large "k",** it is easy for the majority class to win because it will always get the most votes and the "nearest neighbors" would not exert their proper influence. Or, **if we choose a tiny "k",** noise and outliers could unduly influence the classification of the point being classified, again disregarding the influence of the other "nearest neighbors".  
+
+For our example, we will set "k" to the square root of the number of training observations (see below). However, this might not result in the best "k". Thus, we will perform cross-validation on 1:50 "k's" to see how misclassification error varies across the different k-values.  
+
+#4. Split the data
+Now, use caret's handy `createDataPartition` funciton to conduct a stratified random split and divide the Boston data into train and test sets. We choose to put 70% of the data into the training set, and the remaining 30% into the test set. Also create label vectors to be used as identifiers in the classification process:
+```{r}
+library(caret)
+set.seed(1)
+split = createDataPartition(Boston$dis, p=0.70, list=FALSE)
+train = Boston[split, ]
+test = Boston[-split, ]
+
+train_labels = train[,8]
+test_labels = test[,8]
+```
+
+#5. Train the model
+Time to classify! Fit the model to the training data using the `knn` function from the "class" package. This outputs a vector of the predicted classifications. However, let's first choose a "k" using the square root method:
+```{r, eval=FALSE}
+?knn # (click the option from the "class" library)
+```
+```{r}
+# choose our starting k
+round(sqrt(nrow(train)),2) # 18.84
+
+library(class)
+set.seed(1)
+Boston_p = knn(train=train[,-8], test=test[,-8], cl=train_labels, k=19, prob=TRUE)
+```
+
+###5.1. Evaluate its performance
+How did it do? Check out its performance on the test set using the `CrossTable` function from the "gmodels" package:
+```{r}
+library(gmodels)
+CrossTable(x=test_labels, y=Boston_p, 
+           prop.chisq=FALSE,
+           prop.r=TRUE,
+           prop.c=FALSE,
+           prop.t=FALSE)
+table(test_labels)
+```
+How did it do?   
+
+> NOTE: remember that the breaks specified in the cut function above were arbitrary for this toy example. You will probably want to make more informed decisions for your thesis, dissertation, and other professional work!  
+
+###5.2. Improve model performance
+#####1. Normalize the data
+We don't want larger values to indiscriminately affect results. Let's standardize the data to a normal range so that their contributions to the decision-making process become roughly equal. We can do this with `scale`:  
+
+Let's name this scaled dataframe "B":
+```{r}
+B = Boston
+B[,-8] = scale(Boston[,-8], center=TRUE, scale=FALSE)
+```
+```{r, eval=FALSE}
+head(B, 10)
+```
+
+Re-split the data using this transformed "B" dataframe: 
+```{r}
+set.seed(1)
+split_scale = createDataPartition(B$dis, p=0.70, list=FALSE)
+train_scale = B[split_scale, ]
+test_scale = B[-split_scale, ]
+
+train_labels_scale = train_scale[,8]
+test_labels_scale = test_scale[,8]
+```
+
+Fit the model again:
+```{r}
+set.seed(2)
+B_p = knn(train=train_scale[,-8], test=test_scale[,-8], cl=train_labels_scale, k=19, prob=TRUE)
+
+CrossTable(x=test_labels_scale, y=B_p, 
+           prop.chisq=FALSE,
+           prop.r=TRUE,
+           prop.c=FALSE,
+           prop.t=FALSE)
+```
+How did it do?  
+
+#####5.3. Change "k"
+We can also change "k" to evaluate the performance of several models. Ideally, you would use the ["SuperLearner" R package](https://cran.r-project.org/web/packages/SuperLearner/index.html to examine a handful of kNN algorithms with different k-values simultaneously against other algorithms. Below we will examine a range of cross-validated k-values. For now, let's just try a few extremes:
+```{r}
+B_p_k1 = knn(train=train_scale[,-8], test=test_scale[,-8], cl=train_labels_scale, k=1, prob=TRUE)  # k=1
+B_p_k50 = knn(train=train_scale[,-8], test=test_scale[,-8], cl=train_labels_scale, k=50, prob=TRUE)  # k=50
+
+CrossTable(x=test_labels_scale, y=B_p_k1,  # k=1
+           prop.chisq=FALSE,
+           prop.r=TRUE,
+           prop.c=FALSE,
+           prop.t=FALSE)
+
+CrossTable(x=test_labels_scale, y=B_p_k50,  # k=50
+           prop.chisq=FALSE,
+           prop.r=TRUE,
+           prop.c=FALSE,
+           prop.t=FALSE)
+ 
+```
+What happened?  
+
+#6. Another method with a CV error plotting function
+Tidy the transformed "B" data a little:
+```{r}
+grp = B$dis
+X = scale(B[-8], center=TRUE, scale=TRUE)
+k = length(unique(grp))
+dat = data.frame(grp, X)
+n = nrow(X)
+n_train = round(n*2/3)
+
+set.seed(123)
+train_plot = sample(1:n,n_train)
+```
+
+###6.1 Plot the cross-validated errors
+```{r}
+library(chemometrics)
+#pdf("kNN classification.pdf", 9, 6)
+knn_k = knnEval(X, grp, train_plot, 
+                 knnvec=seq(1,50, by=1), 
+                 legpo="bottomright", las=2)
+title("find the best k!")
+#dev.off()
+```
+
+#7. Regression example
+For the regression example, let's return to the `B_reg` copy of the Boston dataset that we made at the beginning because it preserved the numeric class of the "dis" variable. 
+
+First, scale the data:
+```{r}
+B_reg = as.data.frame(scale(B_reg, center=TRUE, scale=TRUE)) 
+```
+
+Second, split the data again: 
+```{r}
+library(caret)
+set.seed(1)
+split_reg = createDataPartition(B_reg$dis, p=0.70, list=FALSE) # split
+train_reg = B_reg[split,]
+test_reg = B_reg[-split,]
+```
+
+Third, fit the model and plot it!
+```{r}
+library(FNN)
+set.seed(1)
+knn_reg = knn.reg(train_reg[,-8], test=NULL, y=train_reg[,8], k=3)
+plot(train_reg[,8], knn_reg$pred, xlab="y", ylab=expression(hat(y)))
+```
+
+Or, use ggplot2 :) 
+```{r}
+library(ggplot2)
+gg_df = data.frame(train_reg[,8], knn_reg$pred)
+colnames(gg_df) = c("distance", "predictions")
+str(gg_df)
+head(gg_df)
+
+gg = ggplot(gg_df, aes(distance, predictions, color=distance)) + 
+  geom_point(size = 5) + 
+  theme_bw() + 
+  xlab("y") + 
+  ylab(expression(hat("y"))) +
+  ggtitle("kNN regression") + 
+  scale_color_continuous(low="yellow", high="red")
+
+c = coef(lm(predictions ~ distance, data=gg_df)) # compute intercept and slope to plot ab line
+c
+class(c) 
+
+#pdf("kNN regression.pdf", 9, 6)
+gg + geom_abline(intercept=c[1], slope=c[2], col="green3")
+#dev.off()
+```
+
+# SuperLearner
+How does knn stack up to some other common algorithms? Ideally you would want to compare these to algorithms such as glmnet, randomForest, XGBoost, SVM, and bartMachine. However, for time purposes, let's just do a simple ensemble that includes the mean benchmark, elastic net, decision tree, and random forest models.  
+
+Rather than the traditional training/test split, this time we can use the entire dataset because we will incorporate [cross validation](https://www.openml.org/a/estimation-procedures/1). 
+
+This time, let's "cut" the median home value "medv" into low and high categories, using the median as our threshold: 
+```{r}
+data(Boston) # quickly reload the Boston dataset to make sure "dis" is numeric again
+
+Boston2 = Boston # make a quick copy
+str(Boston2)
+
+B2 = as.data.frame(scale(Boston2, center = T, scale = T))
+summary(B2$dis)
+
+# this time, let's divide "dis" into a binary outcome: close versus far
+B2$dis = cut(B2$dis, 
+                  breaks=c(-1.2658, -0.8049, 3.9566), # Min., Median, and Max.
+                  levels=c(1,2),
+                  labels=c("close", "far"))
+table(B2$dis)
+```
+
+```{r}
+library(SuperLearner)
+listWrappers() # these are default, untuted algorithms
+alg_library = c("SL.mean", "SL.glmnet", "SL.rpart", "SL.randomForest", "SL.xgboost", "SL.knn") # define library of algorithms to be included 
+
+set.seed(1)
+# fit the model 
+system.time({
+  cv_sl = CV.SuperLearner(Y = Boston[,4], X = Boston[,-8], family = binomial(), V = 10,
+                  SL.library = alg_library)
+})
+
+summary(cv_sl)
+
+plot(cv_sl, col = "blue") + 
+  theme_minimal()
+```
+On the R side of things, we will incorporate SuperLearner often throughout the semester! This code is graciously borrowed form some of the below materials: 
+[superlearner-guide](https://github.com/ck37/superlearner-guide)  
+[superlearner](https://github.com/ck37/SuperLearner)  
+[ck37r](https://github.com/ck37/ck37r)  
+
+See the below links for information on plotting decision boundaries:  
+[Stack Overflow - Variation on “How to plot decision boundary of a k-nearest neighbor classifier from Elements of Statistical Learning?”](http://stackoverflow.com/questions/31234621/variation-on-how-to-plot-decision-boundary-of-a-k-nearest-neighbor-classifier-f)  
+[Stack Overflow - How to plot decision boundary of a k-nearest neighbor classifier from Elements of Statistical Learning?](http://stats.stackexchange.com/questions/21572/how-to-plot-decision-boundary-of-a-k-nearest-neighbor-classifier-from-elements-o/21602#21602)  
+
+Materials compiled from:  
+[-Lantz, Brett. 2013. Machine Learning with R. Birmingham, UK: Packt Publishing, Ltd.](https://www.amazon.com/Machine-Learning-Second-Brett-Lantz/dp/1784393908)  
+[-James G, Witten D, Hastie T, Tibshirani R. 2015. An Introduction to Statistical Learning - with applications in R, 6th ed. Springer: New York](http://www-bcf.usc.edu/~gareth/ISL/ISLR%20Sixth%20Printing.pdf)  
+[-knnEval help page](https://artax.karlin.mff.cuni.cz/r-help/library/chemometrics/html/knnEval.html)
