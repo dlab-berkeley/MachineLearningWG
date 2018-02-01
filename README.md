@@ -2,7 +2,7 @@
 
 In Spring 2018 MWLG will revisit some traditional algorithms:  
 
-January 31: k-nearest neighbor  
+January 31: [k-nearest neighbors    ](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Spring2018/Jan31-knn) 
 
 February 14: decision tree  
 
