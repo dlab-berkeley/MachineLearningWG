@@ -138,7 +138,7 @@ We don't want larger values to indiscriminately affect results. Let's standardiz
 Let's name this scaled dataframe "B":
 ```{r}
 B = Boston
-B[,-8] = scale(Boston[,-8], center=TRUE, scale=FALSE)
+B[,-8] = scale(Boston[,-8], center=TRUE, scale=TRUE)
 ```
 ```{r, eval=FALSE}
 head(B, 10)
@@ -171,10 +171,10 @@ How did it do?
 #####5.3. Change "k"
 We can also change "k" to evaluate the performance of several models. Ideally, you would use the ["SuperLearner" R package](https://cran.r-project.org/web/packages/SuperLearner/index.html to examine a handful of kNN algorithms with different k-values simultaneously against other algorithms. Below we will examine a range of cross-validated k-values. For now, let's just try a few extremes:
 ```{r}
-B_p_k1 = knn(train=train_scale[,-8], test=test_scale[,-8], cl=train_labels_scale, k=1, prob=TRUE)  # k=1
+B_p_k2 = knn(train=train_scale[,-8], test=test_scale[,-8], cl=train_labels_scale, k=2, prob=TRUE)  # k=2
 B_p_k50 = knn(train=train_scale[,-8], test=test_scale[,-8], cl=train_labels_scale, k=50, prob=TRUE)  # k=50
 
-CrossTable(x=test_labels_scale, y=B_p_k1,  # k=1
+CrossTable(x=test_labels_scale, y=B_p_k2,  # k=1
            prop.chisq=FALSE,
            prop.r=TRUE,
            prop.c=FALSE,
@@ -289,7 +289,7 @@ table(B2$dis)
 
 ```{r}
 library(SuperLearner)
-listWrappers() # these are default, untuted algorithms
+listWrappers() # these are default, untuned algorithms
 alg_library = c("SL.mean", "SL.glmnet", "SL.rpart", "SL.randomForest", "SL.xgboost", "SL.knn") # define library of algorithms to be included 
 
 # check out the code for one of the algorithms
@@ -298,8 +298,7 @@ SL.xgboost
 set.seed(1)
 # fit the model 
 system.time({
-  cv_sl = CV.SuperLearner(Y = Boston[,4], X = Boston[,-8], family = binomial(), V = 10,
-                  SL.library = alg_library)
+  cv_sl = CV.SuperLearner(Y = Boston[,4], X = Boston[,-4], family = binomial(), V = 10, SL.library = alg_library)
 })
 
 # What is best single learner?
