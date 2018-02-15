@@ -1,0 +1,1 @@
+RStudio: [![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/dlab-berkeley/MachineLearningWG/master?urlpath=rstudio)
