@@ -57,6 +57,8 @@ tree_model
 # Plot tree graphically.
 plot(tree_model, compress = T)
 # We have to add the plot text manually for some reason.
+# NOTE: you may need to select the plot() and text() lines and run them simultaneously
+# depending on your RStudio settings, e.g. if you get a "plot.new has not been called yet" error.
 text(tree_model, use.n = T)
 ```
 
