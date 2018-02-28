@@ -254,7 +254,7 @@ table(simplify2array(rf4$whichDiscreteSL))
 plot(rf4) + theme_linedraw()
 ```
 
-Acknowledgements:
+See these guides for more:
 [SuperLearner Guide](https://github.com/ck37/superlearner-guide)  
 
 To learn more about plotting decision boundaries in R, check out the mlr package examples [Quick start](http://mlr-org.github.io/mlr-tutorial/release/html/) and [Visualizations of predictions](https://mlr-org.github.io/Visualisation-of-predictions/)
