@@ -35,7 +35,7 @@ We will four different random forest models:
 # Install packages
 Install and `library()` necessary packages.
 ```{r, eval=FALSE}
-# install.packages(c("car", "caret", "ggplot2", "lattice", "plotmo" "randomForest", "rpart", "ROCR", "SuperLearner", "survival", "xgboost"), dependencies = F)
+# install.packages(c("car", "caret", "ggplot2", "lattice", "plotmo", "randomForest", "rpart", "ROCR", "SuperLearner", "survival", "xgboost"), dependencies = F)
 library(car)
 library(caret)
 library(ggplot2)
@@ -120,6 +120,23 @@ Now, we can quickly check the accuracy of the model using the holdout dataset.
 
 ```{r}
 (68 + 99) / nrow(test_set)  #test_set = 74% accuracy
+```
+
+##### 1.3 `plotmo` on `rf1`
+Plot `rf1`!
+```{r}
+?plotmo
+plotmo(rf1, all1 = T) # all1 = T will plot all predictors
+plotmo(rf1, all2 = T) # all2 = T will plot all pairs of predictors
+plotmo(rf1, all2 = T, pt.col = "green", smooth.col = "purple", grid.col = "gray80")
+
+set.seed(1)
+plotmo(rf1, all1 = T, pmethod = "apartdep") 
+
+set.seed(1)
+plotmo(rf1, all1 = T, pmethod = "apartdep", degree1 = 0, degree2 = 3, # return just glucose v. pregnant perspective plot
+       caption = "title goes here",
+       persp.col="orange")
 ```
 
 # Compare multiple models using the `SuperLearner` R package
@@ -239,6 +256,8 @@ plot(rf4) + theme_linedraw()
 
 Acknowledgements:
 [SuperLearner Guide](https://github.com/ck37/superlearner-guide)  
+
+To learn more about plotting decision boundaries in R, check out the mlr package examples [Quick start](http://mlr-org.github.io/mlr-tutorial/release/html/) and [Visualizations of predictions](https://mlr-org.github.io/Visualisation-of-predictions/)
 
 [James G, Witten D, Hastie T, Tibshirani R. 2013. An Introduction to Statistical Learning - with Applications in R. New York: Springer](http://www-bcf.usc.edu/~gareth/ISL/ISLR%20First%20Printing.pdf)  
 
