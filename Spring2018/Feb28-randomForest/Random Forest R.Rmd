@@ -215,7 +215,7 @@ rf3
 ##### 3.2 Assess model performance on `test_set2`
 Then, we want to assess the model performance on test_set and illustrate with a simple barplot.
 ```{r}
-pred2 <- predict(rf3, test_set2, onlySL=TRUE)
+pred2 <- predict(rf3, test_set2, onlySL = T)
 
 summary(pred2$library.predict)
 
