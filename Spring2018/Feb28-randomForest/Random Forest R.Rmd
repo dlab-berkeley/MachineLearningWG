@@ -137,6 +137,10 @@ set.seed(1)
 plotmo(rf1, all1 = T, pmethod = "apartdep", degree1 = 0, degree2 = 3, # return just glucose v. pregnant perspective plot
        caption = "title goes here",
        persp.col="orange")
+
+# image plots
+plotmo(rf1, degree1 = F, type="prob", nresponse="yes", # right graph
+       type2="image", pt.col=ifelse(Mroz$lfp == "yes", "purple", "green3"))
 ```
 
 # Compare multiple models using the `SuperLearner` R package
