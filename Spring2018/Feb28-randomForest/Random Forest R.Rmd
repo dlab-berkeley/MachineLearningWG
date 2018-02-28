@@ -1,0 +1,245 @@
+---
+title: "random forest"
+author: "Evan Muzzall"
+date: "February 28, 2018"
+output:
+  html_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+    toc_float: yes
+---
+```{r}
+# clear environment
+rm(list=ls())
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# What are random forests?
+Random forests are ensemble classifier methods that use multiple decision tree models for classification and regression. 
+
+Unlike decision trees/bagged trees, by default results generally do not require pruning and include accuracy and variable importance information. Furthermore, at each random forest tree split, only a small portion of the predictors are used (rather than the full suite).
+
+We will four different random forest models:
+1. `rf1`: `randomForest` package model  
+
+2. `rf2`: fit this same model in SuperLearn via `SL.SuperLearner`   
+
+3. `rf3`: `SuperLearner` package model compared to `SL.rpart`, `SL.xgboost`, and `SL.mean` models  
+
+4. `rf4`: `SuperLearner` package model with external cross-validation for multi-model comparison and visualization of model differences compared to `SL.rpart`, `SL.xgboost`, and `SL.mean`  
+
+# Install packages
+Install and `library()` necessary packages.
+```{r, eval=FALSE}
+# install.packages(c("car", "caret", "ggplot2", "lattice", "plotmo" "randomForest", "rpart", "ROCR", "SuperLearner", "survival", "xgboost"), dependencies = F)
+library(car)
+library(caret)
+library(ggplot2)
+library(lattice)
+library(plotmo)
+library(randomForest)
+library(rpart)
+library(ROCR)
+library(SuperLearner)
+library(survival)
+library(xgboost)
+```
+
+# Data setup - `Mroz`
+Load and explore Mroz dataset.
+```{r}
+library(car)
+data(Mroz)
+?Mroz
+str(Mroz)
+head(Mroz)
+```
+
+### `lfp` 
+Let's examine frequencies of the `lfp` variable (labor force participation), since it is the one we want to predict.
+```{r, eval=FALSE}
+Mroz$lfp
+```
+```{r}
+library(lattice)
+table(Mroz$lfp)
+barchart(table(Mroz$lfp), col="purple", horizontal = F)
+```
+
+### Stratified random split
+Now, we will use the `createDataPartition` command from the `caret` package to perform a 70/30 stratified random split of the Mroz data into training and test sets. 
+```{r}
+library(caret)
+set.seed(1)
+split <- createDataPartition(Mroz$lfp, p=0.70, list=FALSE)
+training_set <- Mroz[split,]
+test_set <- Mroz[-split,]
+
+dim(Mroz)
+dim(training_set)
+dim(test_set)
+nrow(training_set) + nrow(test_set) == nrow(Mroz) # double check
+```
+
+##### 1.1 `rf1` - fit the model and evaluate `training_set` accuracy
+Using the `randomForest` package, let`s fit a random forest model to predict the number of women who participated or did not participate in the labor force in 1975.
+```{r}
+library(randomForest)
+?randomForest
+set.seed(1)
+rf1 <- randomForest(lfp ~ ., 
+                    data=training_set, 
+                    ntree=500,
+                    mtry=round(sqrt(ncol(Mroz)), digits = 0),
+                    importance=TRUE)
+#NOTE: notice that our response vector `lfp` is a factor - this will assume classification models, otherwise regression will be assumed. If it is omitted entirely, randomForest becomes unsupervised! 
+rf1
+
+# check accuracy on training set
+(170+235) / nrow(training_set)  # training_set = 77% accuracy
+
+rf1$importance
+barchart(rf1$importance, main="rf variable importance - barchart", col="blue", border="black")
+```
+
+##### 1.2 `randomForest` `test_set` accuracy
+Now, let`s see how our model performs on the test data.
+```{r}
+set.seed(1)
+pred <- predict(rf1, newdata=test_set)
+table(pred, test_set$lfp)
+```
+
+Of the 225 test_set observations, We have 68 true negatives (correct `no` predictions) and 99 true positives (correct `yes` predictions).
+
+Now, we can quickly check the accuracy of the model using the holdout dataset. 
+
+```{r}
+(68 + 99) / nrow(test_set)  #test_set = 74% accuracy
+```
+
+# Compare multiple models using the `SuperLearner` R package
+`SuperLearner` is an R package that allows you to easily compare multiple machine learning algorithms at once and/or the same algorithm with different settings.
+
+It then creates an optimal weighted average of those models, aka an "ensemble", using the test data performance. This approach has been proven to be asymptotically as accurate as the best possible prediction algorithm that is tested.
+
+### Coerce `lfp` to integer type
+For binary classification, SuperLearner prefers that your categorical outcome is numeric/integer, rather than factor data type. 
+
+Let's coerce `lfp` from factor to integer type, but first make a copy of `training_set` and `test_set`.
+```{r}
+training_set2 = training_set
+test_set2 = test_set
+
+class(training_set2$lfp)
+class(test_set2$lfp)
+
+?ifelse
+training_set2$lfp <- ifelse(training_set2$lfp=="yes", 1L, 0L)
+test_set2$lfp <- ifelse(test_set2$lfp=="yes", 1L, 0L)
+
+class(training_set2$lfp)
+class(test_set2$lfp)
+```
+```{r, eval=FALSE}
+training_set2$lfp
+test_set2$lfp
+```
+
+### Assign Y variables
+Now, we should assign binary outcome variables for the training and test sets for the `SuperLearner` computations.
+```{r}
+Y <- training_set2$lfp
+Y_test <- test_set2$lfp
+table(Y)
+table(Y_test)
+```
+
+However, because we specify our outcome and predictor variables in SuperLearner, we must remove the outcome variable from our training and test sets because we do not want to include them as a predictor:
+
+```{r}
+training_set2 <- training_set2[,c(2:8)]
+test_set2 <- test_set2[,c(2:8)]
+dim(training_set2)
+dim(test_set2)
+```
+
+##### 2.1 `rf2` fit the second random forest model inside SuperLearner
+```{r}
+library(SuperLearner)
+listWrappers() # we want "SL.randomForest"
+
+rf2 <- SuperLearner(Y = Y, X = training_set2, family = binomial(), SL.library = "SL.randomForest")
+
+rf2
+```
+In the output, Risk is an estimate of model accuracy/performance as estimated by cross-validation of risk on future data. By default it uses 10 folds. 
+
+Coef is how much weight SuperLearner puts on that model in the ensemble weighted-average. If Coef = 0 it means that model is not used at all. 
+
+# Compare multiple models simultaneously
+Now, let's compare our random forest model to two other tree-based models: `SL.rpart` and `SL.xgboost`.
+
+We also include the mean of Y (`SL.mean`) as a benchmark algorithm - if it is the discrete winner, then we can assume that our model fits the data poorly.  
+
+Based on model performance (risk), SuperLearner will also tell us which model is the best (Discrete winner) and also create a weighted average of the multiple models (SuperLearnerer). 
+
+##### 3.1 `rf3` fit the SuperLearner randomForest model in an ensemble
+```{r}
+rf3 <- SuperLearner(Y = Y, X = training_set2, family = binomial(), SL.library = c("SL.mean", "SL.rpart", "SL.randomForest", "SL.xgboost"))
+
+rf3
+```
+
+##### 3.2 Assess model performance on `test_set2`
+Then, we want to assess the model performance on test_set and illustrate with a simple barplot.
+```{r}
+pred2 <- predict(rf3, test_set2, onlySL=TRUE)
+
+summary(pred2$library.predict)
+
+ggplot(as.data.frame(pred2), aes(x = pred)) + 
+  geom_histogram(fill = "blue", color = "black") + 
+  xlab("Predicted values") +
+  theme_minimal()
+```
+
+##### 3.3 AUC on `test_set2`
+We can then check the area under the receiver operator characteristic (ROC) curve to see an alternative performance metric of `rf3` on `test_set2`: 
+```{r}
+library(ROCR)
+pred_rocr <- prediction(pred2$pred, Y_test)
+auc <- performance(pred_rocr, measure = "auc", x.measure = "cutoff")@y.values[[1]]
+auc     # AUC = 0.82 
+```
+
+##### 4.1 `rf4` fit the SuperLearner randomForest model in an ensemble with external cross-validation
+Default cross-validation is set to 10-fold in SuperLearner. However, we can use (external) cross-validation via the `CV.SuperLearner` function. We can also use all the data since we are using this external layer of cross-validation. 
+
+```{r}
+SL_Y = ifelse(Mroz$lfp == "yes", 1, 0)
+SL_X = Mroz[,-1]
+
+set.seed(1)
+
+rf4 <- CV.SuperLearner(Y = SL_Y, X = SL_X, family = binomial(), V = 10, SL.library = c("SL.mean", "SL.rpart", "SL.randomForest", "SL.xgboost"))
+
+rf4
+names(rf4)
+  
+summary(rf4)
+
+table(simplify2array(rf4$whichDiscreteSL))
+plot(rf4) + theme_linedraw()
+```
+
+Acknowledgements:
+[SuperLearner Guide](https://github.com/ck37/superlearner-guide)  
+
+[James G, Witten D, Hastie T, Tibshirani R. 2013. An Introduction to Statistical Learning - with Applications in R. New York: Springer](http://www-bcf.usc.edu/~gareth/ISL/ISLR%20First%20Printing.pdf)  
+
+[Package "SuperLearner"](https://cran.r-project.org/web/packages/SuperLearner/SuperLearner.pdf)
