@@ -16,6 +16,8 @@ rm(list=ls())
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Quick review: decision trees and "bagging" (bootstrap aggregating)  
+
 # What are random forests?
 Random forests are ensemble classifier methods that use multiple decision tree models for classification and regression. 
 
