@@ -135,7 +135,7 @@ set.seed(1)
 plotmo(rf1, all1 = T, pmethod = "apartdep") 
 
 set.seed(1)
-plotmo(rf1, all1 = T, pmethod = "apartdep", degree1 = 0, degree2 = 3, # return just glucose v. pregnant perspective plot
+plotmo(rf1, all1 = T, pmethod = "apartdep", degree1 = 0, degree2 = 3, 
        caption = "title goes here",
        persp.col="orange")
 
