@@ -47,6 +47,7 @@ Courses at Berkeley:
 
 Online classes
 
+* [Tibshirani and Hastie's Statistical Learning Free Course](https://lagunita.stanford.edu/courses/HumanitiesSciences/StatLearning/Winter2016/about)
 * [Coursera Data Science Specialization](https://www.coursera.org/specializations/jhu-data-science)
 * [edX - Principles of Machine Learning](https://www.edx.org/course/principles-machine-learning-microsoft-dat203-2x-2)
 * [edX - Applied Machine Learning](https://www.edx.org/course/applied-machine-learning-microsoft-dat203-3x-0)
