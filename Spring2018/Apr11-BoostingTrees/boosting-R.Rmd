@@ -1,0 +1,228 @@
+---
+title: "R boosted trees walkthrough"
+author: "Evan Muzzall"
+date: "April 11, 2018"
+output: 
+  html_document: 
+    toc: yes
+    toc_float: yes
+---
+
+# Objectives
+#####1 introduction
+*tree based methods - quick review  
+*install packages, load and split data
+#####2 gbm
+*train gbm_fit1 (no tuning)
+*train gbm_fit2 (tune with trainControl and expand.grid)
+*visualize gbm_fit2 models, generate predicted values, compute and plot AUC
+*trainControl and expand.grid functions; train the gbm again
+*generate predicted values and compute AUC
+#####3 xgboost
+*xgboost example
+#####4 SuperLearner
+*SuperLearner example
+
+# 1 introduction: Review tree based methods  
+_(summarized from Chapter 8 or Introduction to Statistical Learning, 7th ed. by James et al. 2013)_  
+Recall that **decision trees** divide the predictor space (the set of possible predicted values) into simpler regions. Through recursive binary splitting, each tree splits based on minimizing RSS for regression trees or classification error for classification trees (% of training observations that do not belong to the most common class) using the mean and mode, repsectively. Decision trees have high variance and single decision trees are likely to overfit. When a large, overly complex tree is grown, **pruning** can be used to prune it back to a subtree with the lowest test error. 
+
+To improve predictive performance, **bagging**, or bootstrap aggregating will boostrap trees based on 2/3 of observations on all features then average the performance across trees. The out of bag error rate **OOB** is often used to estimate test error of the bagged model and is performed on the remaining 1/3 of observations. Variable importance gets lost in the shuffle!
+
+Unlike bagging, **random forests** decorrelate the trees. They build bootstrap training samples but only use a small number of predictors for each tree, then takes the average of the performances of these trees. Thus, the response for each observation is predicted using only trees that included that observation. 
+
+**Boosting** takes this even further - fit decision trees to residuals, add each tree's performance to the fitted function, update residuals, and improve $\hat{f}$. 
+
+From [Freund and Schapire 1999](https://cseweb.ucsd.edu/~yfreund/papers/IntroToBoosting.pdf). 
+"Boosting is a general method for improving the accuracy of any given learning algorithm" and originated in the AdaBoost and PAC learning (p. 1-2). Gradient boosted machines are ensembles decision tree methods of "weak" trees that are just slightly more accurate than random guessing which are then "boosted" into "strong" learners. That is, the models don't have to be accurate over the entire feature space. 
+
+The model first tried to predict each value in a dataset - the cases that can be predicted easily are _downweighted_ so that the algorithm does not have to try as hard to predic them. 
+
+However, the cases that the model has difficulty predicting are _upweighted_ so that the model tries more assertively to predict them. This continues for multiple "boosting" iterations. A resample-based performance measure is produced at each iteration. Error is measured on the weak learners so that even performing slightly better than random guessing improves accuracy fast (p.2). This method can drive down generalization error thus preventing overfitting (p. 5). While it is susceptible to noise, it is robust to outlier detection. 
+
+Boosted trees utilize three main hyperparameters:  
+1. B: number of trees to grow  
+2. $\lambda$: shrinkage (learning rate)  
+3. d: tree depth (number of splits)  
+
+# research question
+How well can we predict "low" versus "high" median home value prices using the other variables from the "BostonHousing" dataset?  
+
+# Install packages
+```{r, eval=FALSE}
+install.packages(c("car", "caret", "mlbench", "pROC", "randomForest", "rpart", "SuperLearner", "xgboost"))
+
+```
+```{r, eval=FALSE}
+library(car)
+library(caret)
+library(mlbench)
+library(pROC)
+library(randomForest)
+library(rpart)
+library(SuperLearner)
+library(xgboost)
+``` 
+
+load data
+```{r}
+library(mlbench)
+data(BostonHousing)
+?BostonHousing
+dat = BostonHousing
+str(dat)
+
+# convert medv to factor: less than or equal to 21.20 = "low", greater than 21.20 = "high"
+dat$medv = cut(dat$medv,
+               breaks = c(0, 21.20, 50),
+               levels = c(1,2),
+               labels = c("low", "high"))
+```
+
+# split data
+```{r}
+library(caret)
+set.seed(1)
+split <- createDataPartition(dat$medv, p=0.70, list=FALSE)
+training_set <- dat[split,] # for gbm; response variable is included
+test_set <- dat[-split,] # for gbm; responses variable is included
+
+X_train = subset(training_set, select = -medv) # for xgboost; response variable is Y_train
+X_test = subset(test_set, select = -medv) # for xgboost; response variable is Y_test
+  
+Y_train = dat$medv[split] # xgboost train response, but need to convert to numeric
+Y_test = dat$medv[-split] # xgboost test response, but need to convert to numeric
+
+Y_train = ifelse(Y_train == "low", 1, 0) # xgboost only allows numeric input; train response
+Y_test = ifelse(Y_test == "low", 1, 0) # xgboost only allows numeric input; test response
+
+X = subset(dat, select = -medv) # for SuperLearner, we can use all the data (minus our response medv)
+Y = subset(dat, select = medv) # include only medv response for SuperLearner!
+
+```
+
+# 2 gbm
+# train gbm_fit1
+```{r}
+set.seed(1)
+gbm_fit1 <- train(medv ~ ., 
+                  data = training_set, 
+                  method="gbm", 
+                  verbose = FALSE)
+gbm_fit1$times
+
+gbm_fit1
+
+summary(gbm_fit1, las=1, main="GBM relative influence")
+```
+
+# trainControl and expand.grid
+Define hyperparameters of the control mechanism via `trainControl`
+```{r}
+control <- trainControl(method="repeatedcv", 
+	repeats=5,
+	classProbs=TRUE,
+	summaryFunction=twoClassSummary)
+```
+
+Compare multiple models at once with `expand.grid`
+```{r}
+grid <- expand.grid(n.trees=seq(100,5100, by=500),
+	interaction.depth=c(1,3,5),
+	shrinkage=c(0.01,0.05, 0.1),
+	n.minobsinnode=10)
+```
+
+Train the gbm again with the control and grid in place: 
+```{r}
+set.seed(1)
+gbm_fit2 <- train(medv ~ ., data=training_set,
+	method="gbm",
+	metric="ROC",
+	trControl=control,
+	tuneGrid=grid,
+	verbose=FALSE)
+gbm_fit2$times
+
+gbm_fit2
+
+summary(gbm_fit2, las=2)
+```
+
+# ggplot line graph of the tuned models
+```{r}
+library(ggplot2)
+ggplot(gbm_fit2) + theme_bw() + ggtitle("Model comparisons") + ylab("AUC") + theme(legend.position = "top")
+```
+
+# generate predicted values and probabilities
+```{r}
+set.seed(1)
+gbm_predicted <- predict(gbm_fit2, test_set)
+gbm_prob <- predict(gbm_fit2, test_set, type="prob")
+```
+
+view final model
+```{r}
+gbm_cm <- confusionMatrix(gbm_predicted, test_set$medv)
+gbm_cm
+```
+
+A confusion/error matrix is a cross-tabulation of observed versus predicted classes
+
+# plot AUC
+```{r}
+library(pROC)
+rocCurve <- roc(response=test_set$medv,
+	predictor = gbm_prob[, "low"],
+	levels = rev(levels(test_set$medv)),
+	auc=TRUE, ci=TRUE)
+```
+
+```{r}
+plot(rocCurve, main="GBM", col="blue", col.main="blue", col.lab="blue")
+rocCurve$auc
+```
+
+# 3 xgboost 
+# xgboost example
+```{r}
+library(xgboost)
+bstSparse <- xgboost(data = data.matrix(X_train), label = Y_train, max.depth = 2, eta = 1, nthread = 2, nround = 20, objective = "binary:logistic")
+
+prediction_values <- predict(bstSparse, xgb.DMatrix(data.matrix(X_test)))
+options(scipen=999)
+prediction_values
+
+prediction_class = as.numeric(prediction_values > 0.5)
+prediction_class
+
+err <- mean(as.numeric(prediction_values >= 0.5) != Y_test)
+print(paste("test-error =", err))
+```
+
+# 4 SuperLearner
+# Superlearner example
+```{r}
+library(SuperLearner)
+cv_sl = CV.SuperLearner(X = dat[,-14], 
+                        Y = ifelse(dat[,14] == "low",1,0),
+                        SL.library = c("SL.xgboost","SL.gbm","SL.rpart","SL.randomForest","SL.mean"),
+                        V=5)
+
+cv_sl
+
+summary(cv_sl)
+
+table(simplify2array(cv_sl$whichDiscreteSL)) # view best
+
+plot(cv_sl) + theme_bw()
+```
+
+# Help
+Examples were drawn from these helpful pages - check them out below!  
+*[caret help page](https://topepo.github.io/caret/)  
+
+*[XGBoost R Tutorial](http://xgboost.readthedocs.io/en/latest/R-package/xgboostPresentation.html)  
+
+*[SuperLearner example](https://github.com/ecpolley/SuperLearner)  
