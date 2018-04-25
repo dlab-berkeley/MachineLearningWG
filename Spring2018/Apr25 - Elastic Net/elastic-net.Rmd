@@ -7,6 +7,11 @@ output:
     toc_float: yes
 ---
 
+```{r install, eval = F}
+# Run if needed.
+install.packages(c("caret", "glmnet", "ranger", "SuperLearner"))
+```
+
 # Background
 
 Penalized regression is a modification of ordinary least squares (OLS) or
@@ -46,17 +51,17 @@ train_index = caret::createDataPartition(Boston[, outcome], p = .8,
                                   times = 1)
 
 # Glmnet wants the data to be matrices, not data frames.
-X_train = as.matrix(Boston[train_index, !names(Boston) == outcome])
-X_test = as.matrix(Boston[-train_index, !names(Boston) == outcome])
+x_train = as.matrix(Boston[train_index, !names(Boston) == outcome])
+x_test = as.matrix(Boston[-train_index, !names(Boston) == outcome])
 
-Y_train = Boston[train_index, outcome]
-Y_test = Boston[-train_index, outcome]
+y_train = Boston[train_index, outcome]
+y_test = Boston[-train_index, outcome]
 
-dim(X_train)
-length(Y_train)
+dim(x_train)
+length(y_train)
 
-dim(X_test)
-length(Y_test)
+dim(x_test)
+length(y_test)
 ```
 
 
@@ -67,7 +72,7 @@ Lasso penalizes coefficients and imposes sparsity, so some coefficients may be s
 ```{r}
 library(glmnet)
 # Fit the lasso to continuous Y
-reg = cv.glmnet(X_train, Y_train, family = "gaussian", alpha = 1)
+reg = cv.glmnet(x_train, y_train, family = "gaussian", alpha = 1)
 
 # Look at distribution of penalty term lambda.
 plot(reg)
@@ -90,10 +95,10 @@ coef(reg, s = "lambda.1se")
 coef(reg, s = "lambda.min")
 
 # Predict on test set.
-pred = predict(reg, s = reg$lambda.1se, newx = X_test)
+pred = predict(reg, s = reg$lambda.1se, newx = x_test)
 
 # Calculate mean-squared error.
-mean((pred - Y_test)^2)
+mean((pred - y_test)^2)
 ```
 
 ## Ridge
@@ -104,7 +109,7 @@ Ridge penalizes the coefficients but does not impose sparsity, so no coefficient
 
 # Fit the ridge to continuous Y
 # We just change alpha to 0 to get ridge regression.
-reg = cv.glmnet(X_train, Y_train, family = "gaussian", alpha = 0)
+reg = cv.glmnet(x_train, y_train, family = "gaussian", alpha = 0)
 
 # Look at distribution of penalty term lambda.
 plot(reg)
@@ -114,10 +119,10 @@ plot(reg)
 plot(reg$glmnet.fit, xvar = "lambda", label = T)
 
 # Predict on test set.
-pred = predict(reg, s = reg$lambda.1se, newx = X_test)
+pred = predict(reg, s = reg$lambda.1se, newx = x_test)
 
 # Calculate mean-squared error.
-mean((pred - Y_test)^2)
+mean((pred - y_test)^2)
 ```
 
 As expected, we do a little worse with ridge compared to lasso.
@@ -125,11 +130,11 @@ As expected, we do a little worse with ridge compared to lasso.
 ## Elastic net
 
 ```{r}
-train_control = trainControl(method = "repeatedCV",
-                             number = 10,
-                             repeats = 3)
-
 set.seed(1)
+train_control = trainControl(method = "repeatedcv",
+                             number = 10L,
+                             repeats = 3L)
+
 
 # Create a custom tuning grid.
 enet_grid = expand.grid(alpha = seq(0, 1, length.out = 5),
@@ -140,7 +145,7 @@ enet_grid
 
 # To be simpler we could just say e.g. tuneLength = 5.
 
-enet = train(X_train, Y_train, method = "glmnet",
+enet = train(x_train, y_train, method = "glmnet",
              #tuneLength = 5,
              tuneGrid = enet_grid,
              trControl = train_control)
@@ -152,10 +157,10 @@ plot(enet)
 enet$bestTune
 
 # Predict on test.
-pred = predict(enet, X_test)
+pred = predict(enet, x_test)
 
 # Review performance
-mean((pred - Y_test)^2)
+mean((pred - y_test)^2)
 ```
 
 ## SuperLearner
@@ -172,7 +177,7 @@ sl_lib = c("SL.mean", "SL.lm", "SL.stepAIC", enet$names, "SL.ranger")
 set.seed(1, "L'Ecuyer-CMRG") 
 
 # This will take a few minutes to execute - take a look at the .html file to see the output!
-cv_sl = CV.SuperLearner(Y = Y_train, X = data.frame(X_train), verbose = TRUE,
+cv_sl = CV.SuperLearner(Y = y_train, X = data.frame(x_train), verbose = TRUE,
                         SL.library = sl_lib, family = gaussian(),
                         cvControl = list(V = 10L))
 
@@ -182,7 +187,6 @@ plot(cv_sl) + theme_bw()
 
 # devtools::install_github("ck37/ck37r")
 # library(ck37r)
-
 ```
 
 # References
