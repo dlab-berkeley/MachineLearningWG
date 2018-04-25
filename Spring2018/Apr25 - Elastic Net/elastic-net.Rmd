@@ -1,0 +1,192 @@
+---
+title: "Penalized regression in R"
+date: "April 25, 2018"
+output: 
+  html_document: 
+    toc: yes
+    toc_float: yes
+---
+
+# Background
+
+Penalized regression is a modification of ordinary least squares (OLS) or
+generalized linear models regression (namely logistic regression) to shrink the
+estimated coefficients closer to zero. This is because the default estimated
+coefficients from linear regression inherently contain some overfitting - they
+are incorporating some random noise in the data that will not be the same for
+new, unseen data.
+
+Penalization addresses this inherent overfitting by changing the objective
+function used to choose the optimal estimated beta coefficients. It says: "I
+want to choose beta coefficients that minimize my loss function (often
+mean-squared error) but I also don't want the sum of the coefficients to be too large."
+
+There are two types of penalization: L1 (sum of absolute values) or L2 (sum of squared values). L2 penalization was the first type of penalized regression, and is called **ridge regression**. It was first published by Hoerl & Kennard in 1970 and allows regression to be used with there are more covariates than observations (p > n). L1 penalization is called **LASSO** (least absolute shrinkage and selection operator) and was first published by Tibshirani in 1996. Lasso has the special property of **sparsity** - it assumes that only a subset of variables are related to the outcome and tends to zero out the coefficients on the least related covariates.
+
+Ridge and lasso can be combined into a single regression called **elastic net**, which takes a weighted average of the L1 and L2 penalties. Elastic net was first published in 2005 by Zou and Hastie; the weighting between L1 and L2 penalties is controlled by the $\alpha$ hyperparamter which ranges between 0 (ridge) and 1 (lasso).
+
+## Data prep
+
+```{r}
+library(MASS)
+data(Boston)
+help(Boston)
+str(Boston)
+summary(Boston)
+
+# Our outcome is median home value.
+outcome = "medv"
+
+# Divide into 80% training, 20% test split.
+# NOTE: this is a shortcut; we prefer to use cross-validation for real projects.
+library(caret)
+set.seed(1)
+train_index = caret::createDataPartition(Boston[, outcome], p = .8, 
+                                  list = F, 
+                                  times = 1)
+
+# Glmnet wants the data to be matrices, not data frames.
+X_train = as.matrix(Boston[train_index, !names(Boston) == outcome])
+X_test = as.matrix(Boston[-train_index, !names(Boston) == outcome])
+
+Y_train = Boston[train_index, outcome]
+Y_test = Boston[-train_index, outcome]
+
+dim(X_train)
+length(Y_train)
+
+dim(X_test)
+length(Y_test)
+```
+
+
+## Lasso
+
+Lasso penalizes coefficients and imposes sparsity, so some coefficients may be shrunk to 0 if they do not appear to be related to the outcome.
+
+```{r}
+library(glmnet)
+# Fit the lasso to continuous Y
+reg = cv.glmnet(X_train, Y_train, family = "gaussian", alpha = 1)
+
+# Look at distribution of penalty term lambda.
+plot(reg)
+
+# Plot the underlying glmnet object, showing
+# coefficients for differnt lambda values.
+plot(reg$glmnet.fit, xvar = "lambda", label = T)
+
+# Lambda with minimum mean-squared error.
+reg$lambda.min
+
+# Higher lambda within 1SE of performance of the minimum.
+# (the "one standard error" rule from Leo Breiman.)
+reg$lambda.1se
+
+# Review coeffients
+coef(reg, s = "lambda.1se")
+
+# What about for lambda.min?
+coef(reg, s = "lambda.min")
+
+# Predict on test set.
+pred = predict(reg, s = reg$lambda.1se, newx = X_test)
+
+# Calculate mean-squared error.
+mean((pred - Y_test)^2)
+```
+
+## Ridge
+
+Ridge penalizes the coefficients but does not impose sparsity, so no coefficient will ever be 0.
+
+```{r}
+
+# Fit the ridge to continuous Y
+# We just change alpha to 0 to get ridge regression.
+reg = cv.glmnet(X_train, Y_train, family = "gaussian", alpha = 0)
+
+# Look at distribution of penalty term lambda.
+plot(reg)
+
+# Plot the underlying glmnet object, showing
+# coefficients for differnt lambda values.
+plot(reg$glmnet.fit, xvar = "lambda", label = T)
+
+# Predict on test set.
+pred = predict(reg, s = reg$lambda.1se, newx = X_test)
+
+# Calculate mean-squared error.
+mean((pred - Y_test)^2)
+```
+
+As expected, we do a little worse with ridge compared to lasso.
+
+## Elastic net
+
+```{r}
+train_control = trainControl(method = "repeatedCV",
+                             number = 10,
+                             repeats = 3)
+
+set.seed(1)
+
+# Create a custom tuning grid.
+enet_grid = expand.grid(alpha = seq(0, 1, length.out = 5),
+                        lambda = 2^seq(-1, -7, length = 5))
+
+# Review the grid.
+enet_grid
+
+# To be simpler we could just say e.g. tuneLength = 5.
+
+enet = train(X_train, Y_train, method = "glmnet",
+             #tuneLength = 5,
+             tuneGrid = enet_grid,
+             trControl = train_control)
+
+print(enet)
+
+plot(enet)
+
+enet$bestTune
+
+# Predict on test.
+pred = predict(enet, X_test)
+
+# Review performance
+mean((pred - Y_test)^2)
+```
+
+## SuperLearner
+
+```{r}
+library(SuperLearner)
+
+enet = create.Learner("SL.glmnet",
+                      tune = list(alpha = c(0, 0.1, 0.5, 0.9, 1.0)),
+                      detailed_names = TRUE)
+
+sl_lib = c("SL.mean", "SL.lm", "SL.stepAIC", enet$names, "SL.ranger")
+
+set.seed(1, "L'Ecuyer-CMRG") 
+
+# This will take a few minutes to execute - take a look at the .html file to see the output!
+cv_sl = CV.SuperLearner(Y = Y_train, X = data.frame(X_train), verbose = TRUE,
+                        SL.library = sl_lib, family = gaussian(),
+                        cvControl = list(V = 10L))
+
+summary(cv_sl)
+
+plot(cv_sl) + theme_bw()
+
+# devtools::install_github("ck37/ck37r")
+# library(ck37r)
+
+```
+
+# References
+
+Intro to Statistical Learning, Chapter 6
+
+[Glmnet vignette by Hastie and Qian](https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html) - lots of great code examples
