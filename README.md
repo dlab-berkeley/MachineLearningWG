@@ -2,29 +2,31 @@
 
 In Spring 2018 MWLG will revisit some traditional algorithms:  
 
-January 31: [k-nearest neighbors    ](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Spring2018/Jan31-knn) 
+* Jan. 31: [k-nearest neighbors    ](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Spring2018/Jan31-knn) 
+* Feb. 14: [decision tree](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Spring2018/decision-trees-feb14)
+* Feb. 28: [random forest](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Spring2018/Feb28-randomForest)
+* Mar. 14: lightning talks  
+* Apr. 11: [gradient boosting](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Spring2018/Apr11-BoostingTrees)
+* Apr. 25: [elastic net](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Spring2018/Apr25%20-%20Elastic%20Net)
+* May 9: lightning talks  
 
-February 14: decision tree  
-
-February 28: random forest  
-
-March 14: lightning talks  
-
-April 11: gradient boosting  
-
-April 25: elastic net  
-
-May 9: lightning talks  
-
-We are always looking for student/staff/faculty presenters. Please contact us if you are interested! 
-
-[The Fall 2017 folder](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Fall2017) covers some basics of neural networks for image processing. 
-
-[The Spring 2017 folder](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Spring2017) covers: k-nearest neighbor classification and regression, stepwise regression, linear and polynomial regression and polynomial and smoothing splines, multivariate adaptive regression splines and generalized additive models, support vector machines, and introductions to neural networks.
-
-[The Fall 2016 folder](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Fall2016) covers: decision trees, random forests, penalized regression, and boosting.
+We are always looking for student/staff/faculty presenters. Please contact us if you are interested!
 
 More information on the [D-Lab MLWG website](http://dlab.berkeley.edu/working-groups/machine-learning-working-group)
+
+## Previous Semesters
+
+* [Fall 2017](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Fall2017)
+  - basics of neural networks for image processing 
+* [Spring 2017](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Spring2017)
+  - k-nearest neighbors
+  - stepwise regression
+  - linear and polynomial regression, smoothing splines
+  - multivariate adaptive regression splines and generalized additive models
+  - support vector machines
+  - neural networks.
+* [Fall 2016](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Fall2016)
+  - decision trees, random forests, penalized regression, and boosting
 
 ## Resources
 
