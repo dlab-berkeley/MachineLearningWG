@@ -12,7 +12,7 @@ In Spring 2018 MWLG will revisit some traditional algorithms:
 
 We are always looking for student/staff/faculty presenters. Please contact us if you are interested!
 
-More information on the [D-Lab MLWG website](http://dlab.berkeley.edu/working-groups/machine-learning-working-group)
+More information on the [D-Lab MLWG website](http://dlab.berkeley.edu/working-groups/machine-learning-working-group-0)
 
 ## Previous Semesters
 
