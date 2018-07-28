@@ -42,6 +42,7 @@ Courses at Berkeley:
 
 * Stat 154 - Statistical Learning
 * CS 189 / CS 289A - Machine Learning
+* COMPSCI x460 - [Practical Machine Learning with R](https://extension.berkeley.edu/search/publicCourseSearchDetails.do?method=load&courseId=17483923&selectedProgramAreaId=15499&selectedProgramStreamId=25856348) [UC Berkeley Extension]
 * PH 252D  - Causal Inference
 * PH 295 - Big Data
 * PH 295 - Targeted Learning for Biomedical Big Data
