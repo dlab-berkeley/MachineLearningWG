@@ -1,14 +1,6 @@
 # Machine Learning Working Group Spring 2018
 
-In Spring 2018 MWLG will revisit some traditional algorithms:  
-
-* Jan. 31: [k-nearest neighbors    ](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Spring2018/Jan31-knn) 
-* Feb. 14: [decision tree](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Spring2018/decision-trees-feb14)
-* Feb. 28: [random forest](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Spring2018/Feb28-randomForest)
-* Mar. 14: lightning talks  
-* Apr. 11: [gradient boosting](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Spring2018/Apr11-BoostingTrees)
-* Apr. 25: [elastic net](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Spring2018/Apr25%20-%20Elastic%20Net)
-* May 9: lightning talks  
+In Fall 2018 MLWG will focus on unsupervised methods - stay tuned! 
 
 We are always looking for student/staff/faculty presenters. Please contact us if you are interested!
 
@@ -16,6 +8,12 @@ More information on the [D-Lab MLWG website](http://dlab.berkeley.edu/working-gr
 
 ## Previous Semesters
 
+* [Spring 2018](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Spring2018)  
+  - k-nearest neighbors  
+  - decision tree  
+  - random forest  
+  - gradient boosting  
+  - elastic net  
 * [Fall 2017](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Fall2017)
   - basics of neural networks for image processing 
 * [Spring 2017](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Spring2017)
