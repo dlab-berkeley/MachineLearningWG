@@ -1,6 +1,7 @@
 # Machine Learning Working Group Spring 2018
 
-In Fall 2018 MLWG will focus on unsupervised methods - stay tuned! 
+Fall 2018 - unsupervised methods  
+  - September 5: Principal Component Analysis  
 
 We are always looking for student/staff/faculty presenters. Please contact us if you are interested!
 
