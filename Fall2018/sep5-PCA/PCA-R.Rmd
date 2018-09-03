@@ -1,0 +1,342 @@
+---
+title: "Principal Component Analysis (PCA)"
+author: "Evan"
+date: "8/31/2018"
+output:
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+    fig_width: 8
+    fig_height: 7
+---
+
+# Goals  
+1) Demonstrate PCA using the [iris dataset](https://en.wikipedia.org/wiki/Iris_flower_data_set).  
+
+2) Walkthrough [this excellent example](https://stats.stackexchange.com/questions/72839/how-to-use-r-prcomp-results-for-prediction) for a machine learning application.  
+
+3) Update your ggplot-ing skills as PCA produces excellent visualizations.  
+
+### Resources
+There are many resources available to learn about ordination techniques such as PCA. [Start here!](http://ordination.okstate.edu/)  
+
+# Load the data
+```{r}
+# load the data that is pre-baked into R
+data(iris)
+
+# or 
+# iris = read.csv("./iris.csv")
+
+# view its structure
+str(iris)
+
+# see how our classes are distributed
+table(iris$Species)
+```
+
+### What do we want to accomplish, exactly?
+1) Load and scale the numeric data (PCA is grossly affected by scale!) and visualize it with boxplots.  
+2) Use the `princomp` R function to fit the model on the numeric data and  
+  * view the scree plot to see which principal components we want to plot  
+  * create a quick biplot to see how our variables are correlated  
+  * construct a scatterplot  
+3) Extract the first two principal component loadings to view variation along these axes.  
+4) Compare training dataset versus test dataset predictive accuracy using a simple machine learning setup with the `prcomp` function.  
+
+# Install + library necessary packages
+```{r, include = F}
+if (FALSE) {
+  install.packages(c(
+    
+    # use createDataPartition to do a stratified random split
+    "caret", 
+    
+    # beautiful plots
+    "ggplot2", 
+    
+    # reshaping data for ggplot-int
+    "reshape2")) 
+
+# run only lines 46-55 manually to install the packages if necessary
+}
+
+# library the packages
+library(caret)
+library(ggplot2) 
+library(reshape2) 
+
+# see library(help = "ggplot2") to list available functions from any package
+```
+
+# Setup
+### Scale the numeric variables
+```{r}
+# copy Species into into its own variable
+Species = iris$Species
+
+# create a subset named "numeric" that contains only the numeric variables
+numeric <- iris[,1:4]
+head(numeric)
+
+# scale the numeric data
+scaled <- data.frame(scale(numeric, center=TRUE, scale=TRUE))
+head(scaled)
+
+# combine Species and scaled into the dataset we will use
+data = cbind(Species, scaled)
+head(data)
+```
+
+# Density curve exploration
+Construct density curves to see how the scaled numeric variables look
+```{r}
+# reshape the data to long / univariate format for ease of ggplot-ing
+library(reshape2)
+scaled_melt = melt(data, id.vars = "Species")
+head(scaled_melt)
+
+# explore the data using density curves
+curves = ggplot(scaled_melt, aes(x = value, fill = Species)) + 
+  geom_density(alpha = 0.5) + 
+  theme_bw() + 
+  facet_wrap(~variable) + theme(legend.position = "top") + 
+  scale_fill_manual(values = c("red", "green", "blue")) # custom color scale, just for fun
+curves
+```
+
+### The value of unsupervised approaches
+Since we are not trying to predict the value of any target variable like in supervised approaches, the value of unsupervised machine learning can be to see how data separate based solely on the nature of their features. This is a major value, as we can include all of the data at once, and just see how it sorts! 
+
+> NOTE: At more intermediate levels, unsupervised approaches are highly useful for optimizing other machine learning algorithms.  
+
+# What is PCA?
+In short:  
+  * A powerful linear transformation technique to explore patterns in data and highly correlated variables.  
+  * Useful for distilling variation across many variables onto a reduced feature space (e.g., a 2D scatterplot) while maintaining the integrity of the data.  
+
+### How to make it work:   
+1) Scale the data  
+2) Compute Eigenpairs (via eigendecomposition on covariance matrix or correlation matrix; singular value decomposition).  
+  2.1) Eigenvectors - principal component; stored in projection matrix **_W_**. Defines directions of the new feature space.  
+  2.2) Eigenvalues - explain magnitudes of the Eigenvector and how much variance is found along each axis.  
+3) Choose the eigenvectors **_k_** with largest eigenvalues.  
+4) Use **_W_** to transform an original dataset **_A_** to the **_k_**-dimensional feature subspace named **_Y_**.  
+
+### Math stuff (not covered today)
+To learn more about the math behind it all, check out:  
+  * pages 230-237 and Chapter 10 from the always useful [James et al's **An introduction to statistical learning - with applications in R**](http://www-bcf.usc.edu/~gareth/ISL/),  
+  * [Jordan's (1987) **An introduction to linear algebra in parallel distributed processing**](https://www.cs.cmu.edu/afs/cs/academic/class/15883-f15/readings/jordan-1986-ch9.pdf), and  
+  * [Kolter and Do's (2015) **Linear algebra review and reference**](http://www.cs.cmu.edu/~zkolter/course/15-884/linalg-review.pdf).  
+  
+# `princomp` PCA
+Now, fit the PCA model using the built-in `princomp` function and check out the **screeplot, biplot, and scatterplots!**
+```{r, include = F, echo = F}
+# review the feature names
+names(scaled)
+
+# fit the model and view its output
+pca_princomp = princomp(scaled, scores = T, cor = T)
+pca_princomp
+
+# view the importance of components
+# pay particular attention to the second row "Proportion of Variance"
+summary(pca_princomp)
+
+# view the screeplot and biplot
+plot(pca_princomp, main = "princomp: scree plot")
+biplot(pca_princomp, main = "princomp: biplot")
+```
+
+Like most variables in R, we can unpack their contents. View the names of our `pca_princomp` object, print the scores, view the component loadings, and place them inside a dataframe
+```{r}
+# view the things we can unpack inside pca_princomp
+names(pca_princomp)
+
+# print the scores
+head(pca_princomp$scores)
+
+# view component loadings
+pca_princomp$loadings
+
+# place the scores for the first three principal components inside a dataframe
+pca_princomp_df = data.frame(pca_princomp$scores[,1], pca_princomp$scores[,2], pca_princomp$scores[,3])
+
+# add a column for Species
+pca_princomp_df$Species = data$Species
+
+# rename athe columns
+colnames(pca_princomp_df) = c("PC1 scores", "PC2 scores", "PC3 scores", "Species")
+
+# reorder the columns
+pca_princomp_df = pca_princomp_df[, c(4, 1, 2, 3)]
+
+head(pca_princomp_df)
+```
+
+# Construct a gg-scatterplot 
+```{r}
+pca_princomp_plot <- ggplot(pca_princomp_df, 
+                            aes(x = pca_princomp_df[,2], y = pca_princomp_df[,3], 
+                                color = Species,
+                                shape = Species)) + 
+  geom_point(size = 5, alpha = 0.5) + 
+  ggtitle("iris princomp scatterplot") + 
+  xlab("Component 1 (73%)") + 
+  ylab("Component 2 (23%)") + 
+  stat_ellipse(show.legend = FALSE, lwd = 1) + 
+  labs(color= "Species") +
+  theme_bw() + 
+  theme(legend.position = "top") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(plot.title = element_text(size=40)) + 
+  theme(legend.title=element_text(size=20)) + 
+  theme(legend.text=element_text(size=20)) 
+pca_princomp_plot
+```
+
+# `princomp` PCA - loadings
+Now, extract the loadings to see which features contribute most to the variation along each component
+```{r, include = F, echo = F}
+# define loadings inside of a data.frame
+pca_loadings = data.frame(pca_princomp$loadings[,1], pca_princomp$loadings[,2])
+colnames(pca_loadings) = c("PC 1", "PC 2")
+pca_loadings
+
+# plot first principal component (or "axis", aka PC 1) as a bar plot
+pca_pc1 <- ggplot(pca_loadings, aes(x = rownames(pca_loadings), y = pca_loadings[,1])) + 
+  geom_bar(stat="identity") +
+  ggtitle("princomp: PC 1 loadings") +
+  xlab("PC 1 (73%)") + 
+  ylab("") + 
+  ylim(-1, 1) +
+  theme_classic() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+pca_pc1
+
+# plot for PC 2
+pca_pc2 <- ggplot(pca_loadings, aes(x = rownames(pca_loadings), y = pca_loadings[,2])) + 
+  geom_bar(stat="identity") +
+  ggtitle("princomp: PC 2 loadings") +
+  xlab("PC 2 (23%)") + 
+  ylab("") + 
+  ylim(-1, 1) +
+  theme_classic() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+pca_pc2
+```
+
+### `princomp` PCA - loadings in 2D
+You can also view the loadings in two dimensions
+```{r, include = F, echo = F}
+pca_loadings_2D <- ggplot(pca_loadings, aes(x = pca_loadings[,1], y = pca_loadings[,2])) + 
+  geom_text(label = rownames(pca_loadings), size = 7) + 
+  xlim(-1,1) +
+  xlab("Component 1 (73%)") + ylab("Component 2 (23%)") + ggtitle("iris princomp loadings scatterplot") + 
+  theme_minimal()
+pca_loadings_2D
+```
+
+##### `PCAmix` PCA 
+If you have mixed data and want to see how you can add factor/categorical variables to your model, check out the excellent [PCAmix package](https://cran.r-project.org/web/packages/PCAmixdata/PCAmixdata.pdf) and look through its awesome [vignette](https://cran.r-project.org/web/packages/PCAmixdata/vignettes/PCAmixdata.html) to get started. 
+
+##### NA handling
+For efficient NA handling, the [`geometric.mean` function from the `psych` package](https://www.rdocumentation.org/packages/psych/versions/1.8.4/topics/geometric.mean) and the [`impute_missing_values` function from the `ck37r` package](https://cran.r-project.org/web/packages/ck37r/README.html) are two ways to get started.  
+
+##### Interactive 3D plots
+Visualizing _three_ principal components at once is often useful when your screeplot suggests that more than the first two components should be investigated. To create interactive 3D plots, check out the [`plot3d` function from the `rgl` package](https://cran.r-project.org/web/packages/rgl/vignettes/rgl.html). However, You might need to first install [`XQuartz`](https://www.xquartz.org/).  
+
+# PCA - basic machine learning example with `prcomp`
+Let's walk through this example: [Stack Overflow - How to use R prcomp results for prediction?](https://stats.stackexchange.com/questions/72839/how-to-use-r-prcomp-results-for-prediction)
+
+First, create a 70/30 training/test split
+```{r}
+# Set seed for reproducibility.
+set.seed(1)
+
+# Create a stratified random split.
+training_rows = caret::createDataPartition(data$Species, p = 0.70, list = FALSE) 
+
+train_x = data[training_rows, ] # partition training dataset
+test_x = data[-training_rows, ] # partition test dataset
+
+dim(train_x)
+dim(test_x)
+
+table(train_x$Species)
+table(test_x$Species)
+```
+
+# fit PCA model to training set
+```{r}
+?prcomp
+pca_ml <- prcomp(train_x[, -1], retx=TRUE, center=TRUE, scale=TRUE)
+pca_ml
+
+# view percentage of variance explaine
+summary(pca_ml)
+
+# or
+expl.var <- round(pca_ml$sdev^2/sum(pca_ml$sdev^2)*100, 4) 
+expl.var
+
+# generate predicted values of PCs for test dataset
+predicted_values <- predict(pca_ml, newdata=test_x[,2:5])
+head(predicted_values)
+```
+
+### Define some plotting parameters
+```{r}
+# assign one color to each species
+species_colors <- c(1:3)
+
+# assign one shape for the training data and another shape for the test data
+species_shapes <- c(1,16)
+
+# which PCs to plot?
+num_PCs <- c(1,2) 
+```
+
+### Store the scores inside of dataframes
+```{r}
+# assign the data into dataframes like before
+gg_train = data.frame(pca_ml$x[, num_PCs])
+str(gg_train)
+
+gg_test = data.frame(predicted_values[, num_PCs])
+str(gg_test)
+```
+
+# Construct the scatterplot
+We can plot the training and test data on the same plot! 
+
+> Squares = training data; ellipses are 95% confidence ellipses for training data  
+> Circles = test data
+
+```{r}
+ggplot(
+  
+  # training data
+  
+  gg_train, aes(x = gg_train[,1], y = gg_train[,2], color = train_x$Species)) + 
+  geom_point(shape = 0, alpha = .5, stroke = 2, size = 5) + 
+  stat_ellipse(show.legend = F, lwd = 0.5) + 
+  labs(color= "Species") + 
+  xlab("PC 1 (72%)") + 
+  ylab("PC 2 (25%)") + 
+  theme_bw() + 
+  
+  # test data
+  
+  geom_point(gg_test, mapping = aes(x = gg_test[,1], y = gg_test[,2], 
+                                    color = test_x$Species, size = 10)) + 
+  guides(size = F) + 
+  theme(legend.position = "top") + 
+  ggtitle("PCA iris scatterplot") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(plot.title = element_text(size=40)) + 
+  theme(legend.title=element_text(size=20)) + 
+  theme(legend.text=element_text(size=20))  
+```
+
