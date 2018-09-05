@@ -65,6 +65,7 @@ Courses at Berkeley:
 
 Online classes:  
 
+* [D-Lab's Introduction to Data Science for Social Scientists](https://campus.sagepub.com/introduction-to-data-science-for-social-scientists#introduction-to-data-science-for-social-scientists/intro)
 * [Data 8X: Foundations of Data Science](https://data.berkeley.edu/education/data-8x)  
 * [Tibshirani and Hastie's Statistical Learning Free Course](https://lagunita.stanford.edu/courses/HumanitiesSciences/StatLearning/Winter2016/about)
 * [Coursera Data Science Specialization](https://www.coursera.org/specializations/jhu-data-science)
