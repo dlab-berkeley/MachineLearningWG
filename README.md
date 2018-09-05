@@ -62,3 +62,4 @@ Other Campus Groups
 * [The Hacker Within](http://www.thehackerwithin.org/berkeley/) / Berkeley Institute for Data Science
 * [Machine Learning @ Berkeley](https://ml.berkeley.edu/)  
 * [Berkeley Statistics and Machine Learning Discussion Group](https://bids.berkeley.edu/news/bids-launches-new-berkeley-statistics-and-machine-learning-discussion-group)  
+* [Graduate Data Science Organization](https://gdso.berkeley.edu/)  
