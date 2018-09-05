@@ -35,7 +35,21 @@ Books:
 2. **Applied Predictive Modeling** by Max Kuhn [(Amazon)](https://smile.amazon.com/Applied-Predictive-Modeling-Max-Kuhn-ebook/dp/B00K15TZU0/)
 3. **Elements of Statistical Learning** by Hastie et al.  [(free pdf)](http://statweb.stanford.edu/~tibs/ElemStatLearn/download.html) [(Amazon)](https://smile.amazon.com/Elements-Statistical-Learning-Prediction-Statistics-ebook/dp/B00475AS2E/)
 4. **Modern Multivariate Statistical Techniques** by Alan Izenman [(Amazon)](https://smile.amazon.com/Modern-Multivariate-Statistical-Techniques-Classification-ebook/dp/B00HWUR9CS/)
-5. **Differential Equations and Linear Algebra** by Stephen Goode and Scott Annin [(Amazon)](https://www.amazon.com/Differential-Equations-Linear-Algebra-Stephen-ebook/dp/B00HR7MR3W/ref=mt_kindle?_encoding=UTF8&me=)
+5. **Differential Equations and Linear Algebra** by Stephen Goode and Scott Annin [(Amazon)](https://www.amazon.com/Differential-Equations-Linear-Algebra-Stephen-ebook/dp/B00HR7MR3W/ref=mt_kindle?_encoding=UTF8&me=)  
+
+Other:  
+* [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)  
+* [Introduction to Probability and Statistics Using R, 3rd ed.](https://cran.r-project.org/web/packages/IPSUR/vignettes/IPSUR.pdf)  
+* [R for Data Science](http://r4ds.had.co.nz/)  
+* [The tidyverse style guide](http://style.tidyverse.org/)  
+* [bookdown](https://bookdown.org/)  
+* [Quick Intro to Parallel Computing in R](https://nceas.github.io/oss-lessons/parallel-computing-in-r/parallel-computing-in-r.html)  
+
+Help:  
+* [Getting Help with R](https://www.r-project.org/help.html)  
+* [Stack Overflow](https://stackoverflow.com/questions/tagged/r)  
+* [Quick-R](https://www.statmethods.net/)  
+* [R-Bloggers](https://www.r-bloggers.com/)  
 
 Courses at Berkeley:
 
@@ -45,7 +59,7 @@ Courses at Berkeley:
 * PH 252D  - Causal Inference
 * PH 295 - Big Data
 * PH 295 - Targeted Learning for Biomedical Big Data
-* INFO - TBD
+* Data 8, CS61A, CS61B, CS 61C, CS70/Math 55, CS 188, CS 189, Math 53, Math 54, Math 110, Stat 28, Stat 20/21, Stat 133, Stat 134/140, Data 100.  
 
 Online classes
 
@@ -57,9 +71,10 @@ Online classes
 
 Other Campus Groups
 
-* [D-Lab's Cloud Computing Working Group](http://dlab.berkeley.edu/working-groups/cloud-working-group)  
+* [D-Lab's Cloud Computing Working Group](http://dlab.berkeley.edu/working-groups/cloud-working-group-0)  
 * [D-Lab's Computational Text Analysis Working Group](http://dlabctawg.github.io/)  
 * [The Hacker Within](http://www.thehackerwithin.org/berkeley/) / Berkeley Institute for Data Science
 * [Machine Learning @ Berkeley](https://ml.berkeley.edu/)  
 * [Berkeley Statistics and Machine Learning Discussion Group](https://bids.berkeley.edu/news/bids-launches-new-berkeley-statistics-and-machine-learning-discussion-group)  
 * [Graduate Data Science Organization](https://gdso.berkeley.edu/)  
+* [Berkeley Division of Data Sciences](https://data.berkeley.edu/)
