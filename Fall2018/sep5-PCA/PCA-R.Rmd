@@ -37,7 +37,7 @@ table(iris$Species)
 ```
 
 ### What do we want to accomplish, exactly?
-1) Load and scale the numeric data (PCA is grossly affected by scale!) and visualize it with boxplots.  
+1) Load and scale the numeric data (PCA is grossly affected by scale!) and visualize it with density curves.  
 2) Use the `princomp` R function to fit the model on the numeric data and  
   * view the scree plot to see which principal components we want to plot  
   * create a quick biplot to see how our variables are correlated  
@@ -59,7 +59,7 @@ if (FALSE) {
     # reshaping data for ggplot-int
     "reshape2")) 
 
-# run only lines 46-55 manually to install the packages if necessary
+# run only lines 51-63 manually to install the packages if necessary
 }
 
 # library the packages
@@ -166,7 +166,7 @@ pca_princomp_df = data.frame(pca_princomp$scores[,1], pca_princomp$scores[,2], p
 # add a column for species
 pca_princomp_df$species = data$species
 
-# rename athe columns
+# rename the columns
 colnames(pca_princomp_df) = c("PC1 scores", "PC2 scores", "PC3 scores", "species")
 
 # reorder the columns
@@ -294,10 +294,10 @@ num_PCs = c(1,2)
 ```{r}
 # assign the data into dataframes like before
 gg_train = data.frame(pca_ml$x[, num_PCs])
-str(gg_train)
+head(gg_train)
 
 gg_test = data.frame(predicted_values[, num_PCs])
-str(gg_test)
+head(gg_test)
 ```
 
 # Construct the scatterplot
