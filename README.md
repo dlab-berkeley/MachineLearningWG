@@ -1,14 +1,16 @@
-# Machine Learning Working Group Spring 2018
+# Machine Learning Working Group, Fall 2018
 
-Fall 2018 - unsupervised methods  
-  - September 5: Principal Component Analysis   
-  - September 19: k-means clustering  
-  - October 3: hierarchical clustering  
-  - October 17: Medoid partitioning  
-  - October 31: tSNE  
-  - November 14: UMAP  
-  - November 28: TextXD / Latent Class Analysis (?)  
-  - December 12: Lightning talks  
+MLWG meets on alternating Wednesdays from 3-5pm at D-Lab (Barrows 356).
+
+**Fall 2018 - unsupervised methods**  
+  - Sept. 5: Principal component analysis (PCA)
+  - Sept. 19: K-means clustering  
+  - Oct. 3: Hierarchical clustering  
+  - Oct. 17: Medoid partitioning  
+  - Oct. 31: tSNE  
+  - Nov. 14: UMAP  
+  - Nov. 28: TextXD / Latent Class Analysis (?)  
+  - Dec. 12: Lightning talks  
 
 We are always looking for student/staff/faculty presenters. Please contact us if you are interested!
 
