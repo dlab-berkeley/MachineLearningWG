@@ -1,7 +1,14 @@
 # Machine Learning Working Group Spring 2018
 
 Fall 2018 - unsupervised methods  
-  - September 5: Principal Component Analysis  
+  - September 5: Principal Component Analysis   
+  - September 19: k-means clustering  
+  - October 3: hierarchical clustering  
+  - October 17: Medoid partitioning  
+  - October 31: tSNE  
+  - November 14: UMAP  
+  - November 28: TextXD / Latent Class Analysis (?)  
+  - December 12: Lightning talks  
 
 We are always looking for student/staff/faculty presenters. Please contact us if you are interested!
 
