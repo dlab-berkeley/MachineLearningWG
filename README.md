@@ -1,6 +1,6 @@
 # Machine Learning Working Group, Fall 2018
 
-MLWG meets on alternating Wednesdays from 3-5pm at D-Lab (Barrows 356).
+We meet on alternating Wednesdays from 3-5pm at D-Lab (Barrows 356). We have no expectation of prior machine learning experience, and simply go through one algorithm a meeting, with about 30 minutes each in R & Python.
 
 **Fall 2018 - unsupervised methods**  
   - Sept. 5: Principal component analysis (PCA)
