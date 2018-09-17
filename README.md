@@ -3,13 +3,13 @@
 We meet on alternating Wednesdays from 3-5pm at D-Lab (Barrows 356). We have no expectation of prior machine learning experience, and simply go through one algorithm a meeting, with about 30 minutes each in R & Python.
 
 **Fall 2018 - unsupervised methods**  
-  - Sept. 5: Principal component analysis (PCA)
+  - Sept. 5: [Principal component analysis (PCA)](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Fall2018/sep5-PCA)
   - Sept. 19: K-means clustering  
   - Oct. 3: Hierarchical clustering  
   - Oct. 17: Medoid partitioning  
   - Oct. 31: tSNE  
   - Nov. 14: UMAP  
-  - Nov. 28: TextXD / Latent Class Analysis (?)  
+  - Nov. 28: Latent Class Analysis 
   - Dec. 12: Lightning talks  
 
 We are always looking for student/staff/faculty presenters. Please contact us if you are interested!
