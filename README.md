@@ -4,7 +4,7 @@ We meet on alternating Wednesdays from 3-5pm at D-Lab (Barrows 356). We have no 
 
 **Fall 2018 - unsupervised methods**  
   - Sept. 5: [Principal component analysis (PCA)](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Fall2018/sep5-PCA)
-  - Sept. 19: K-means clustering  
+  - Sept. 19: [K-means clustering](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Fall2018/2-sep19-k-means)
   - Oct. 3: Hierarchical clustering  
   - Oct. 17: Medoid partitioning  
   - Oct. 31: tSNE  
