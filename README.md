@@ -42,7 +42,7 @@ Books:
 
 1. **Intro to Statistical Learning** by James et al. [(free pdf)](http://www-bcf.usc.edu/~gareth/ISL/ISLR%20First%20Printing.pdf) [(Amazon)](https://smile.amazon.com/Introduction-Statistical-Learning-Applications-Statistics-ebook/dp/B01IBM7790/)
 2. **Applied Predictive Modeling** by Max Kuhn [(Amazon)](https://smile.amazon.com/Applied-Predictive-Modeling-Max-Kuhn-ebook/dp/B00K15TZU0/)
-3. **Python Data Science Handbook** by Jake VanderPlas [online version](https://jakevdp.github.io/PythonDataScienceHandbook/)
+3. **Python Data Science Handbook** by Jake VanderPlas [(online version)](https://jakevdp.github.io/PythonDataScienceHandbook/)
 4. **Elements of Statistical Learning** by Hastie et al.  [(free pdf)](http://statweb.stanford.edu/~tibs/ElemStatLearn/download.html) [(Amazon)](https://smile.amazon.com/Elements-Statistical-Learning-Prediction-Statistics-ebook/dp/B00475AS2E/)
 5. **Modern Multivariate Statistical Techniques** by Alan Izenman [(Amazon)](https://smile.amazon.com/Modern-Multivariate-Statistical-Techniques-Classification-ebook/dp/B00HWUR9CS/)
 6. **Differential Equations and Linear Algebra** by Stephen Goode and Scott Annin [(Amazon)](https://www.amazon.com/Differential-Equations-Linear-Algebra-Stephen-ebook/dp/B00HR7MR3W/ref=mt_kindle?_encoding=UTF8&me=)  
