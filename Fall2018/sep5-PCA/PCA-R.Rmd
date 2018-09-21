@@ -99,7 +99,7 @@ head(scaled_melt)
 
 # explore the data using density curves
 ggplot(scaled_melt, aes(x = value, fill = species)) + 
-  geom_density(alpha = 0.5) + 
+  geom_density(alpha = 0.9) + 
   theme_bw() + 
   facet_wrap(~variable) + 
   theme(legend.position = "top") + 
@@ -263,7 +263,7 @@ table(test_x$species)
 # fit PCA model to training set
 ```{r}
 ?prcomp
-pca_ml = prcomp(train_x[, -1], retx = TRUE, center = TRUE, scale = TRUE)
+pca_ml = prcomp(train_x[, -1], retx = TRUE, center = FALSE, scale = FALSE)
 pca_ml
 
 # view percentage of variance explaine
