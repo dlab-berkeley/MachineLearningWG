@@ -47,15 +47,6 @@ Books:
 5. **Modern Multivariate Statistical Techniques** by Alan Izenman [(Amazon)](https://smile.amazon.com/Modern-Multivariate-Statistical-Techniques-Classification-ebook/dp/B00HWUR9CS/)
 6. **Differential Equations and Linear Algebra** by Stephen Goode and Scott Annin [(Amazon)](https://www.amazon.com/Differential-Equations-Linear-Algebra-Stephen-ebook/dp/B00HR7MR3W/ref=mt_kindle?_encoding=UTF8&me=)  
 
-Other:  
-
-* [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)  
-* [Introduction to Probability and Statistics Using R, 3rd ed.](https://cran.r-project.org/web/packages/IPSUR/vignettes/IPSUR.pdf)  
-* [R for Data Science](http://r4ds.had.co.nz/)  
-* [The tidyverse style guide](http://style.tidyverse.org/)  
-* [bookdown](https://bookdown.org/)  
-* [Quick Intro to Parallel Computing in R](https://nceas.github.io/oss-lessons/parallel-computing-in-r/parallel-computing-in-r.html)  
-
 Help:  
 
 * [Getting Help with R](https://www.r-project.org/help.html)  
@@ -71,12 +62,9 @@ Courses at Berkeley:
 * PH 252D  - Causal Inference
 * PH 295 - Big Data
 * PH 295 - Targeted Learning for Biomedical Big Data
-* Data 8, CS61A, CS61B, CS 61C, CS70/Math 55, CS 188, CS 189, Math 53, Math 54, Math 110, Stat 28, Stat 20/21, Stat 133, Stat 134/140, Data 100.  
 
 Online classes:  
 
-* [D-Lab's Introduction to Data Science for Social Scientists](https://campus.sagepub.com/introduction-to-data-science-for-social-scientists#introduction-to-data-science-for-social-scientists/intro)
-* [Data 8X: Foundations of Data Science](https://data.berkeley.edu/education/data-8x)  
 * [Tibshirani and Hastie's Statistical Learning Free Course](https://lagunita.stanford.edu/courses/HumanitiesSciences/StatLearning/Winter2016/about)
 * [Coursera Data Science Specialization](https://www.coursera.org/specializations/jhu-data-science)
 * [edX - Principles of Machine Learning](https://www.edx.org/course/principles-machine-learning-microsoft-dat203-2x-2)
@@ -87,8 +75,6 @@ Other Campus Groups:
 
 * [D-Lab's Cloud Computing Working Group](http://dlab.berkeley.edu/working-groups/cloud-working-group-0)  
 * [D-Lab's Computational Text Analysis Working Group](http://dlabctawg.github.io/)  
-* [The Hacker Within](http://www.thehackerwithin.org/berkeley/) / Berkeley Institute for Data Science
+* [The Hacker Within](http://www.thehackerwithin.org/berkeley/) / [Berkeley Institute for Data Science](https://bids.berkeley.edu/)
 * [Machine Learning @ Berkeley](https://ml.berkeley.edu/)  
 * [Berkeley Statistics and Machine Learning Discussion Group](https://bids.berkeley.edu/news/bids-launches-new-berkeley-statistics-and-machine-learning-discussion-group)  
-* [Graduate Data Science Organization](https://gdso.berkeley.edu/)  
-* [Berkeley Division of Data Sciences](https://data.berkeley.edu/)  
