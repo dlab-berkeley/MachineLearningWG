@@ -217,7 +217,8 @@ References and resources:
 - [Analysis of Phylogenetics and Evolution](http://ape-package.ird.fr/)  
 - [A Quick Tour of mclust](https://cran.r-project.org/web/packages/mclust/vignettes/mclust.html)  
 - [mclust vignette (from 2012, but more detailed)](https://www.stat.washington.edu/sites/default/files/files/reports/2012/tr597.pdf)  
-
-Also, see the [cluster](https://cran.r-project.org/web/packages/cluster/cluster.pdf) R package to learn more about agnes, clara, daisy, diana, fanny, flower, mona, and pam cluster methods!  
+- A very [useful walkthrough](https://quantdev.ssri.psu.edu/sites/qdev/files/Unsupervised_Machine_Learning_The_mclust_Package_and_others.html) by Christian Lopez  
+- [MoEClust:](https://cran.r-project.org/web/packages/MoEClust/vignettes/MoEClust.html) Gaussian Parsimonious Clustering Models with Gating and Expert Network Covariates  
+- See the [cluster](https://cran.r-project.org/web/packages/cluster/cluster.pdf) R package to learn more about agnes, clara, daisy, diana, fanny, flower, mona, and pam cluster methods!  
 
 
