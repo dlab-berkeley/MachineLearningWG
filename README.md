@@ -3,9 +3,9 @@
 We meet on alternating Wednesdays from 3-5pm at D-Lab (Barrows 356). We have no expectation of prior machine learning experience, and simply go through one algorithm a meeting, with about 30 minutes each in R & Python. We also incorporate lightning talks and other guest presentations throughout our meetings.
 
 **Fall 2018 - unsupervised methods**  
-  - Sept. 5: [Principal component analysis (PCA)](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Fall2018/sep5-PCA)
+  - Sept. 5: [Principal component analysis (PCA)](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Fall2018/1-sep5-PCA)
   - Sept. 19: [K-means clustering](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Fall2018/2-sep19-k-means)
-  - Oct. 3: [Hierarchical clustering](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Fall2018/oct3-hier_agg_clust)
+  - Oct. 3: [Hierarchical clustering](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Fall2018/3-oct3-hier_agg_clust)
   - Oct. 17: Medoid partitioning  
   - Oct. 31: tSNE  
   - Nov. 14: UMAP  
