@@ -18,14 +18,17 @@ Hierarchical agglomerative clustering is a "bottom-up" method of clustering. Eac
 
 Distance and cluster method information are usually displayed at the bottom of the graph, while the vertical axis displays the height, which refers to the distance between two clusters. We are not concerned as much with distances along the horizontal axis. We can also "cut" the dendrogram to specify a number of clusters, which is similar to defining _k_ in k-means clustering (which is also equally problematic).  
 
+In a real-life research situation, you will likely want to scale the data. However, raw data are used in this example. 
 # Package installation
 ```{r}
 if (FALSE) {
   # Run this line manually (once) to install the necessary packages.
   # Install packages from CRAN:
-  install.packages(c("pvclust", "mclust"))
+  install.packages(c("ape", "pvclust", "mclust"))
 }
 
+# fancy dendrogram options
+library(ape)
 # dendrograms with p-values
 library(pvclust)
 # model-based clustering
@@ -38,7 +41,7 @@ data(mtcars)
 ?mtcars
 ```
 
-Start by using the `hclust` built-in function from [{stats}](https://www.rdocumentation.org/packages/stats/versions/3.5.1). `hclust` prefers a dissimilarity matrix via the `dist` function, thus it plots rows as opposed to columns like the methods below. 
+Start by using the `hclust` built-in function from [{stats}](https://www.rdocumentation.org/packages/stats/versions/3.5.1). `hclust` prefers a dissimilarity matrix via the `dist` function, thus it plots rows as opposed to columns like the methods further below. 
 
 # The `hclust` built-in function
 ```{r}
@@ -80,7 +83,7 @@ plot(as.phylo(hclust_model), type = "unrooted")
 # radial plot
 colors = c("red", "orange", "blue", "green", "purple")
 clus5 = cutree(hclust_model, 5)
-plot(as.phylo(hclust_model), type = "fan", tip.color = colors[clus5], lwd = 3, cex = 2)
+plot(as.phylo(hclust_model), type = "fan", tip.color = colors[clus5], lwd = 2, cex = 1)
 ```
 
 > NOTE: the color settings for the radial plot apply to the other ape plots as well.  
@@ -89,7 +92,7 @@ plot(as.phylo(hclust_model), type = "fan", tip.color = colors[clus5], lwd = 3, c
 The [pvclust](http://stat.sys.i.kyoto-u.ac.jp/prog/pvclust/) package offers a straightfoward way to perform hierarchical agglomerative clustering of columns with two types of p-values at each split: approximately unbiased **(AU)** and bootstrap probability **(BP)**. 
 ```{r}
 library(pvclust)
-# Fit pvclust-model on features
+# Cluster features
 
 # Ward's method: minimum variance between clusters
 system.time({
