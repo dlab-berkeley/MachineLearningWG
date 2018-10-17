@@ -1,0 +1,216 @@
+---
+title: "Medoid clustering"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Implementations:
+
+1. [cluster::pam](https://stat.ethz.ch/R-manual/R-devel/library/cluster/html/pam.html)
+2. [kmed](https://cran.r-project.org/web/packages/kmed/vignettes/kmedoid.html)
+3. [hopach](https://www.bioconductor.org/packages/release/bioc/html/hopach.html)
+
+## Installation
+
+Run this section once manually - it will not be run when knitting the markdown file.
+
+```{r eval=FALSE}
+# cluster is a built-in package.
+
+# kmed
+install.packages("kmed")
+
+# hopach
+## try http:// if https:// URLs are not supported
+source("https://bioconductor.org/biocLite.R")
+biocLite("hopach")
+
+```
+
+### Load libraries
+
+```{r}
+library(cluster)
+library(kmed)
+library(hopach)
+```
+
+## Data prep
+
+We're trying out a birth weight dataset.
+
+```{r}
+data = MASS::birthwt
+summary(data)
+?MASS::birthwt
+data$race = factor(data$race, labels = c("white", "black", "other"))
+str(data)
+
+# Create a list to hold different variables.
+vars = list(
+  # Birth weight or low are generally our outcomes for supervised analyses.
+  outcomes = c("bwt", "low"),
+  
+  # Variables we want to exclude from our analysis - none currently.
+  exclude = NULL
+)
+
+vars$covariates = setdiff(names(data), vars$outcomes)
+
+# Review our data structure.
+vars
+```
+
+
+## K-med package
+
+```{r kmed}
+
+# Review covariate structure
+str(data[, vars$covariates])
+
+# Create distance matrix.
+# NOTE: perhaps we should center & scale data beforehand.
+dist_mat =
+  # This function is for "mixed" variable data - numeric, binary, and/or categorical.
+  distmix(data[, vars$covariates],
+          # There are 6 options for method here. 
+          method = "gower",
+          # method = "huang",
+          # Harikumar seems to require all integer data.
+          # method = "harikumar",
+          # method = "wishart",
+          # Provide column numbers for the numeric variables.
+          idnum = which(vars$covariates %in% c("age", "lwt", "ptl", "ftv")),
+          # Binary variables.
+          idbin = which(vars$covariates %in% c("smoke", "ht", "ui")),
+          # Categorical variables.
+          idcat = which(vars$covariates %in% c("race")))
+
+# 189 x 189.
+dim(dist_mat)
+# Same as the number of observations.
+nrow(data)
+
+# Conduct the medoids analysis with 3 clusters.
+# Other function options: rankkmed, stepkmed.
+result = fastkmed(dist_mat, ncluster = 3, iterate = 50)
+
+# Examine distribution of low birth weight across clusters.
+table("cluster" = result$cluster, "low wgt" = data$low)
+prop.table(table("cluster" = result$cluster, "low wgt" = data$low), margin = 1)
+```
+
+Does cluster help us predict birth weight?
+
+```{r kmed_ols}
+# OLS 1: don't include cluster.
+reg1 = lm(bwt ~ .,
+         data = data[, c(vars$covariates, vars$outcomes[1])])
+summary(reg1)
+
+# OLS 2: with cluster included.
+reg2 = lm(bwt ~ .,
+         data = cbind(data[, c(vars$covariates, vars$outcomes[1])],
+                      cluster = factor(result$cluster)))
+summary(reg2)
+```
+
+We have a reasonable increase in adjusted R-squared.  How else could we examine the possible benefit of the cluster variable on our predictive accuracy? Are other methods preferable to gower?
+
+```{r}
+# a simple and fast k-medoids function for bootstrap evaluation
+boot_kmed = function(distmat, nclust) {
+  result = fastkmed(distmat, nclust, iterate = 50)
+  return(result$cluster)
+}
+
+# k-means function for bootstrap evaluation
+boot_kmeans = function(x, nclust) {
+  result = kmeans(x, nclust)
+  return(result$cluster)
+}
+
+k = 3
+num_boots = 50
+fastkmedboot = clustboot(dist_mat, nclust = k, boot_kmed, nboot = num_boots)
+# For k-means we need to create a numeric matrix (i.e. convert factor to indicators)
+data_mat = model.matrix(~ ., data = data[, vars$covariates])[, -1]
+kmeansboot = clustboot(data_mat, nclust = k, boot_kmeans,
+                        nboot = num_boots, diss = FALSE)
+
+# Consensus matrix creation.
+
+wardorder <- function(x, nclust) {
+  res <- hclust(x, method = "ward.D2")
+  member <- cutree(res, nclust)
+  return(member)
+}
+consensusfastkmed <- consensusmatrix(fastkmedboot, nclust = k, wardorder)
+
+clustheatmap(consensusfastkmed, "Clustering via Fast K-medoids")
+
+consensuskmeans <- consensusmatrix(kmeansboot, nclust = k, wardorder)
+clustheatmap(consensuskmeans, "Clustering via K-means")
+```
+
+
+## Cluster: partitioning around medoids
+
+```{r cluster_pam}
+# Maybe we can figure out during MLWG?
+
+result_pam =
+  cluster::pam(data[, vars$covariates], k = 3,
+               metric = "euclidean")
+               #metric = "manhattan")
+
+# Output is a bit too verbose.
+summary(result_pam)
+
+# We get a PCA plot with ellipsoids,
+# Then a silhouette plot.
+plot(result_pam)
+```
+
+(sklearn info on silhouette plots)[http://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_silhouette_analysis.html]
+
+## HOPACH package
+
+```{r hopach}
+# We use the numeric data matrix here, which has converted factors to indicators.
+dist = distancematrix(data_mat,
+                      d = "cosangle",
+                      # d = "cor",
+                      na.rm = TRUE)
+dim(dist)
+
+hobj = hopach(data_mat, dmat = dist)
+
+# Number of clusters identified.
+hobj$clust$k  
+
+# Review sizes of each cluster.
+hobj$clust$sizes 
+
+# This plot is recommended but does not seeem that useful.
+dplot(dist, hobj, ord="final", main="Distance matrix", showclusters = FALSE)  
+
+# Bootstrap analysis
+# TODO: identify how to set seed.
+bobj = boothopach(data_mat, hobj, B = 100)
+
+###################################################
+### code chunk number 7: bootplot (eval = FALSE)
+################################################
+bootplot(bobj, hobj, ord = "bootp",
+         main = "Bootstrap plot", showclusters = FALSE)
+
+```
+
+## Resources
+
+Please see the package references - several great articles in there, especially kmed. Kaufman and Rousseeuw (1990) is one of the classic textbooks.
