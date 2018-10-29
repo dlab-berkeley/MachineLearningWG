@@ -1,0 +1,195 @@
+---
+title: "tSNE"
+author: "Evan"
+date: "10/24/2018"
+output: 
+  html_document: 
+    toc: yes
+    toc_float: yes
+---
+
+```{r set-options, echo = FALSE, cache = FALSE}
+options(width = 140)
+```
+
+# tSNE!
+t-distributed stochastic neighbor embedding (tSNE) is a nonlinear, nonparametric, and unsupervised dimension reduction machine learning algorithm. It is used to find patterns in high-dimensional data.  
+
+Recall that dimension reduction techniques such as [PCA](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Fall2018/1-sep5-PCA) help us reduce high-dimensional linear data into a reduced feature space, such as 2 or 3 main axes of "distilled" variation that can be efficiently visualized.  
+
+These visualizations often look a little nicer than those for PCA because instead of plotting distances between observations, tSNE plots the _probabilities_ instead! This is based on [Kullback-Leibler divergences](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) (the loss function). It becomes difficult to say what PCA data separation looks like in higher-dimensional space because it can be dubious to extrapolate lower dimension representations into higher ones. 
+
+### Some key hyperparameters include:  
+* dims - the number of dimensions to be returned.  
+* [Perplexity](https://en.wikipedia.org/wiki/Perplexity) - essentially the number of nearest neighbors, but in the curved/surface-like [manifold](https://stats.stackexchange.com/questions/289467/what-is-a-manifold) setting instead of stright-line distances. Should be less than the number of observations, but it is not that simple...  
+* theta - the Barnes-Hut tradeoff, ranging from 0 to 1. This is the speed/accuracy tradeoff with lower values give slower but more accurate optimizations. 0.0 returns  he exact tSNE value (defaults to 0.5).  
+* eta - learning rate.  
+* check_duplicates - should duplicate observations be removed?  
+
+# Package installation
+Run these lines manually if you need to install or update the following packages:
+```{r}
+if (FALSE) {
+  install.packages(c(
+    # train/test data splitting
+    "caret",
+    # Our sole ML algorithm this time around
+    "randomForest",
+    # tSNE algorithms
+    "Rtsne", "tsne"
+    )) 
+}
+```
+
+Library the required packages
+```{r}
+library(caret)
+library(randomForest)
+library(Rtsne)
+library(tsne)
+```
+
+# Load the `iris` dataset
+```{r}
+data(iris)
+
+# Learn about the dawta
+?iris
+
+# View its structure
+str(iris)
+
+# How many of each species?
+table(iris$Species)
+```
+
+# Goals
+We will fit one model using the tsne package and one using the Rtsne package. Then, we will use the Rtsne model to add coordinates to our dataset and to train and evaluate a random forest algorithm on these new data.  
+
+# `tsne` package
+Here, the help files outline a concise way to fit the tSNE algorithm via a brief plotting function:
+```{r}
+# Define colors for plotting
+colors = rainbow(length(unique(iris$Species)))
+
+# Assign one color to each species
+names(colors) = unique(iris$Species)
+colors
+
+# Define the function
+ecb = function(x,y){
+  plot(x,t = 'n')
+  text(x,labels = iris$Species, col = colors[iris$Species]) 
+  }
+
+# Fit
+set.seed(1)
+system.time({
+tsne_iris = tsne::tsne(iris[, -5], epoch_callback = ecb, perplexity = 50)
+})
+```
+
+### `Rtsne` example
+Rtsne provides clearer hyperparameters, better help, and more flexibility compared to the tsne model. 
+```{r}
+# You might want to remove duplicate observations (even if they are stochastic)... (so that you are not computing distances between two identical points?)
+
+set.seed(1)
+Rtsne_iris <- Rtsne::Rtsne(as.matrix(iris[, -5]), 
+                    # Return just the first two dimensions
+                    dims = 2,
+                    # Let's set perplexity to 5% of the number of rows
+                    # Try setting it to a larger value as well, like 25%
+                    perplexity = nrow(iris) * 0.05,
+                    # try changing theta to 0.0 to see what happens
+                    theta = 0.5, 
+                    # change eta to 0 and see what happens!
+                    eta = 1, 
+                    # Tell the algorithm it is okay to have duplicate rows
+                    check_duplicates = F) 
+# Unpack!
+names(Rtsne_iris)
+
+# Plot first two dimensions
+plot(Rtsne_iris$Y[, 1:2],col = iris$Species) 
+```
+
+# Visual comparison to PCA
+```{r}
+pca_iris = princomp(iris[,1:4])$scores[,1:2]
+plot(pca_iris, t = 'n')
+text(pca_iris, labels = iris$Species, col = colors[iris$Species])
+```
+
+# A machine learning example
+Let's recapitulate [Mark Borg's walkthrough here](https://mark-borg.github.io/blog/2016/tsne-ml/). Let's keep working with our `Rtsne_iris` model from above. cbind the tSNE coordinates into our dataset in order to fit a random forest on this new dataset!
+```{r}
+# Add tSNE coordinates via cbind
+data = cbind(iris, Rtsne_iris$Y)
+
+# Rename the new columns
+colnames(data)[6] = "tSNE_Dim1"
+colnames(data)[7] = "tSNE_Dim2"
+
+# Check out the dataset
+head(data)
+
+# Split the data
+set.seed(1)
+split = caret::createDataPartition(data$Species, p = 0.75, list = FALSE)
+training_set = data[split,]
+test_set = data[-split,]
+
+# Identify species "target" variable and predictors for train and test sets
+X_train = training_set[, -5]
+Y_train = training_set$Species
+
+X_test = test_set[, -5]
+Y_test = test_set$Species
+```
+
+Fit the random forest:
+```{r, echo = T, results = "hide"}
+set.seed(1)
+RF = randomForest(X_train, Y_train, X_test, Y_test,
+                  ntree = 500, 
+                  proximity = T,
+                  importance = T,
+                  keep.forest = T,
+                  do.trace = T)
+```
+```{r}
+predicted = predict(RF, X_test)
+table(predicted, Y_test)
+mean(predicted == Y_test)
+varImpPlot(RF)
+```
+
+# Resources
+[tSNE FAQ](https://lvdmaaten.github.io/tsne/). Laurens van der Maaten blog.  
+
+Cao, Y and L Wang. 2017. [Automatic selection of t-SNE perplexity.](https://arxiv.org/pdf/1708.03229.pdf) Journal of Machine Learning Research: Workshop and Conference Proceedings 1:1-7.  
+
+Linderman, GC and S. Stenerberger. 2017. [Clustering with t-SNE, provably.](https://arxiv.org/pdf/1706.02582.pdf) 	arXiv:1706.02582 [cs.LG].  
+
+Pezzotti et al. 2017. [Approximated and user steerable tSNE for progressive visual analytics.](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7473883&tag=1) IEEE Transactions on Visualization and Computer Graphics 23:1739-1752.  
+
+Schubert E. and M. Gertz. 2017. [Intrinsic t-stochastic neighbor embedding for visualization and outlier detection: A remedy against the curse of dimensionality?](https://pdfs.semanticscholar.org/97a0/d8798aec210c68a8532d907e4e7c193754a6.pdf) In: Beecks C., Borutta F., Kröger P., Seidl T. (eds) Similarity Search and Applications (SISAP). Lecture Notes in Computer Science, Springer, 10609:188-203.  
+
+Wattenberg et al. 2016. [How to use t-SNE effectively](https://distill.pub/2016/misread-tsne/)
+
+colah's blog. 2015. [Visualizing representations: Deep learning and human beings.](https://colah.github.io/posts/2015-01-Visualizing-Representations/)  
+
+Wang W et al. 2015. [On deep multi-view representation learning.](http://proceedings.mlr.press/v37/wangb15.pdf) Journal of Machine Learning Research: Workshop and Conference Proceedings 37.  
+
+van der Maaten, LJP. 2014. [Accelerating t-SNE using Tree-Based Algorithms.](http://jmlr.org/papers/volume15/vandermaaten14a/vandermaaten14a.pdf) Journal of Machine Learning Research, 15:3221-3245.  
+
+Hamel, P and D. Eck. 2010. [Learning features from music audio with deep belief networks.](http://www.mirlab.org/conference_papers/international_conference/ISMIR%202010/ISMIR_2010_papers/ismir2010-58.pdf) 11th International Society for Music Information Retrieval Conference 339-344.  
+
+Jamieson AR et al. 2010. [Exploring nonlinear feature space dimension reduction and data representation in breast CADx with Laplacian eigenmaps and t-SNE.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2807447/) Medical Physics 37:339-351.  
+
+van der Maaten, LJP. 2009. [Learning a Parametric Embedding by Preserving Local Structure.](https://lvdmaaten.github.io/publications/papers/AISTATS_2009.pdf) In Proceedings of the Twelfth International Conference on Artificial Intelligence and Statistics (AISTATS), Journal of Machine Learning Research Workshop and Conference Proceedings 5:384-391.  
+
+van der Maaten LJP and GE Hinton. 2008. [Visualizing Data Using t-SNE.](http://www.jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf) Journal of Machine Learning Research 9:2579-2605.  
+
+Also check out [umapr](https://ropensci.org/blog/2018/08/01/umapr/) and [uwot](https://github.com/jlmelville/uwot).  
