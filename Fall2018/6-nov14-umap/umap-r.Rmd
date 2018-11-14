@@ -1,0 +1,75 @@
+---
+title: "UMAP"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Data prep
+
+We're trying out a birth weight dataset.
+
+```{r}
+data = MASS::birthwt
+summary(data)
+?MASS::birthwt
+data$race = factor(data$race, labels = c("white", "black", "other"))
+str(data)
+
+# Create a list to hold different variables.
+vars = list(
+  # Birth weight or low are generally our outcomes for supervised analyses.
+  outcomes = c("bwt", "low"),
+  
+  # Variables we want to exclude from our analysis - none currently.
+  exclude = NULL
+)
+
+vars$covariates = setdiff(names(data), vars$outcomes)
+
+# Review our data structure.
+vars
+
+dplyr::glimpse(data[vars$covariates])
+sapply(data[vars$covariates], class)
+```
+
+```{r}
+library(umap)
+class(data[vars$covariates])
+# Convert factor to indicators and remove intercept column.
+data_mat = model.matrix(~ ., data[vars$covariates])[, -1]
+summary(data_mat)
+
+result = umap(data_mat)
+```
+
+```{r}
+dim(result)
+class(result)
+class(result[, 1])
+
+library(ggplot2)
+
+# Compile results into a dataframe.
+plot_data = data.frame(x = result$layout[, 1],
+                       y = result$layout[, 2],
+                       data[, vars$outcomes])
+
+# Create an initial plot object.
+p = ggplot(data = plot_data, aes(x = x, y = y, color = low)) +
+  theme_minimal()
+
+# Plot binary outcome
+p + geom_point() + ggtitle("Low birth weight = 1")
+
+# Compare to continuous outcome.
+p + geom_point(aes(color = bwt)) + ggtitle("Continuous birth weight")
+```
+
+## Challenge
+
+Compare to tSNE using code from our last meeting.
