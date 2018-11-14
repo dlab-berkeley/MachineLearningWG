@@ -103,6 +103,8 @@ p + geom_point(aes(x = result3$layout[, 1],
                    y = result3$layout[, 2]))
 ```
 
+More info on hyperparameters on the [umap-learn python documentation page](https://umap-learn.readthedocs.io/en/latest/parameters.html).
+
 ```{r}
 ?umap
 ```
