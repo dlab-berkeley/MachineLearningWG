@@ -1,5 +1,5 @@
 ---
-title: "UMAP"
+title: "UMAP: Uniform Manifold Approximation and Projection"
 output: html_document
 ---
 
@@ -7,6 +7,11 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Background
+
+* Arxiv paper: (https://arxiv.org/abs/1802.03426)
+* PyData 2018 talk (PCA, tSNE, and UMAP): (https://www.youtube.com/watch?v=YPJQydzTLwQ)
+* PyCon 2018 talk: (https://www.youtube.com/watch?v=nq6iPZVUxZU)
 
 ## Data prep
 
@@ -44,13 +49,15 @@ class(data[vars$covariates])
 data_mat = model.matrix(~ ., data[vars$covariates])[, -1]
 summary(data_mat)
 
-result = umap(data_mat)
+# Conduct UMAP analysis of our matrix data, setting a random seed.
+result = umap(data_mat, random_state = 1)
 ```
 
-```{r}
+## Plot UMAP
+
+```{r umap_plot}
 dim(result)
 class(result)
-class(result[, 1])
 
 library(ggplot2)
 
@@ -70,6 +77,40 @@ p + geom_point() + ggtitle("Low birth weight = 1")
 p + geom_point(aes(color = bwt)) + ggtitle("Continuous birth weight")
 ```
 
+## Hyperparameters
+
+```{r}
+# Review default settings.
+umap.defaults
+
+config = umap.defaults
+
+# Set a seed.
+config$random_state = 1
+config$n_neighbors = 30
+
+result2 = umap(data_mat, config)
+
+p + geom_point(aes(x = result2$layout[, 1],
+                   y = result2$layout[, 2]))
+
+# Try even more neighbors.
+config$n_neighbors = 60
+
+result3 = umap(data_mat, config)
+
+p + geom_point(aes(x = result3$layout[, 1],
+                   y = result3$layout[, 2]))
+```
+
+```{r}
+?umap
+```
+
 ## Challenge
 
-Compare to tSNE using code from our last meeting.
+* Compare to tSNE using code from our last meeting.
+* Other datasets to try: MNIST, iris, your own dataset.
+
+
+
