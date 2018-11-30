@@ -9,7 +9,6 @@ We meet on alternating Wednesdays from 3-5pm at D-Lab (Barrows 356). We have no 
   - Oct. 17: [Medoid partitioning](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Fall2018/4-medoids)
   - Oct. 31: tSNE  
   - Nov. 14: [UMAP](https://github.com/dlab-berkeley/MachineLearningWG/tree/master/Fall2018/6-nov14-umap)
-  - Nov. 28: Latent class analysis 
   - Dec. 12: Lightning talks  
 
 We are always looking for student/staff/faculty presenters. Please contact us if you are interested!
