@@ -45,7 +45,7 @@ Books:
 4. **Elements of Statistical Learning** by Hastie et al.  [(free pdf)](http://statweb.stanford.edu/~tibs/ElemStatLearn/download.html) [(Amazon)](https://smile.amazon.com/Elements-Statistical-Learning-Prediction-Statistics-ebook/dp/B00475AS2E/)
 5. **Modern Multivariate Statistical Techniques** by Alan Izenman [(Amazon)](https://smile.amazon.com/Modern-Multivariate-Statistical-Techniques-Classification-ebook/dp/B00HWUR9CS/)
 6. **Differential Equations and Linear Algebra** by Stephen Goode and Scott Annin [(Amazon)](https://www.amazon.com/Differential-Equations-Linear-Algebra-Stephen-ebook/dp/B00HR7MR3W/ref=mt_kindle?_encoding=UTF8&me=)  
-7. **Statistical Learning with Sparsity: The Lasso and Generalizations** by Trevor Hastie, Robert Tibshirani, and Martin Wainwright [Amazon](https://www.amazon.com/Statistical-Learning-Sparsity-Generalizations-Probability/dp/1498712169/ref=sr_1_fkmrnull_1?crid=2OQXF1KIQYDUX&keywords=statistical+learning+with+sparsity+the+lasso+and+generalizations&qid=1552196190&s=gateway&sprefix=Statistical+Learning+with+Sparsity%3A+the+Lasso+and+gener%2Caps%2C178&sr=8-1-fkmrnull) and [free pdf](https://web.stanford.edu/~hastie/StatLearnSparsity/).  
+7. **Statistical Learning with Sparsity: The Lasso and Generalizations** by Trevor Hastie, Robert Tibshirani, and Martin Wainwright [(free pdf)](https://web.stanford.edu/~hastie/StatLearnSparsity/) [(Amazon)](https://www.amazon.com/Statistical-Learning-Sparsity-Generalizations-Probability/dp/1498712169/ref=sr_1_fkmrnull_1?crid=2OQXF1KIQYDUX&keywords=statistical+learning+with+sparsity+the+lasso+and+generalizations&qid=1552196190&s=gateway&sprefix=Statistical+Learning+with+Sparsity%3A+the+Lasso+and+gener%2Caps%2C178&sr=8-1-fkmrnull) and   
 
 Help:  
 
